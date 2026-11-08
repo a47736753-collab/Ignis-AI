@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Fire at Zone D5",
+    "zone": "Zone D5",
+    "scores": [30, 36, 44, 56, 66, 74, 81, 86],
+    "note": "Write one sentence about what happened in this fire."
+  }
+]

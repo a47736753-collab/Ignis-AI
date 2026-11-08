@@ -1,0 +1,17 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Backups
+*.bak
+
+# Logs and system files
+*.log
+.DS_Store
+
+# Vercel
+.vercel/
