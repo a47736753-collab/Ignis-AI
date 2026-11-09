@@ -12,10 +12,10 @@ const DRIVER_NAMES = {
 
 const SYSTEM_PROMPT_EXPLAIN = [
   "You are the explanation layer of IGNIS AI, a forest-fire risk early-warning prototype.",
-  "A machine-learning model has ALREADY produced the risk score. Your only job is to explain it in plain language for a fire-station officer.",
+  "IGNIS AI's deterministic weighted scoring engine (an expert-set formula, NOT a trained machine-learning model) has ALREADY produced the risk score. Your only job is to explain it in plain language for a fire-station officer.",
   "Rules:",
   "- Use ONLY the numbers in the JSON you are given. Never change, recompute or question the score. Never invent data, accuracy figures, dates, fire history or places.",
-  "- Do not say the prediction is validated or certain. This is a prototype running on demonstration data.",
+  "- Do not say the prediction is validated or certain. This is a prototype. The dataSource field says whether inputs are synthetic demonstration data or user-uploaded observations; never describe demonstration data as real measurements, and never claim accuracy.",
   "- The explanation must be 2 or 3 short sentences. Give at most 3 factors and at most 3 preventive actions.",
   "- Actions must be practical: patrols, staging tankers and crews, community advisories, re-checking the forecast.",
   "- Plain text only. No markdown.",
@@ -26,7 +26,8 @@ const SYSTEM_PROMPT_BRIEFING = [
   "You are the Tactical Briefing Officer of IGNIS AI, an early-warning wildfire risk platform prototype.",
   "Your task is to generate an Operational Fire Danger Briefing for station commanders and field supervisors.",
   "Rules:",
-  "- Base your briefing EXCLUSIVELY on the provided 7-day forecast data, active zone alerts, weather drivers, and nearest villages.",
+  "- Base your briefing EXCLUSIVELY on the provided forecast data, active zone alerts, weather drivers, and nearest villages. The scores come from IGNIS AI's deterministic weighted engine, not a machine-learning model.",
+  "- State the dataSource (demonstration vs user-uploaded) in the briefing so readers know what the numbers are based on.",
   "- Never contradict the scores. Never invent fake fires, historical incidents, or false certifications.",
   "- If information is unavailable or outside the provided forecast scope, explicitly state that.",
   "- Clearly note that dispatches and alerts on this platform are simulated prototype actions.",
@@ -44,6 +45,7 @@ const SYSTEM_PROMPT_CHAT = [
   "- Never invent non-existent zones, numbers, or unverified fire detections.",
   "- If the user asks about data or zones not provided in the context, explicitly state that the information is unavailable in the current 7-day forecast model.",
   "- Note that dispatches and alerts on this platform are demonstration simulations, not live deployments.",
+  "- The dataSource field says whether the numbers are synthetic demonstration data or user-uploaded observations. Mention it when relevant and never present demonstration data as real.",
   "- Keep answers concise, factual, and tactical (under 160 words).",
   "- Focus on firefighter safety, resource staging, containment difficulty, and community warnings.",
   "- Plain text with bullet points if listing items. No verbose fluff.",
@@ -60,6 +62,18 @@ function num(v, min, max, name) {
   const n = Number(v);
   if (!Number.isFinite(n) || n < min || n > max) throw httpError(400, "Invalid " + name + ".");
   return n;
+}
+
+function cleanSource(raw) {
+  const r = raw && typeof raw === "object" ? raw : {};
+  const type = r.type === "user-upload" ? "user-upload" : "demo";
+  const out = { type, description: type === "user-upload" ? "User-uploaded observations (not independently verified)" : "Synthetic demonstration data (illustrative, not real measurements)" };
+  if (type === "user-upload") {
+    out.name = cleanStr(r.name, 80);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(r.dateStart || ""))) out.dateStart = r.dateStart;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(r.dateEnd || ""))) out.dateEnd = r.dateEnd;
+  }
+  return out;
 }
 
 function cleanStr(s, maxLen) {
@@ -97,6 +111,7 @@ function validate(body) {
     conditions,
     nearestVillage: cleanStr(body.nearestVillage, 40),
     nearestStation: cleanStr(body.station, 40),
+    dataSource: cleanSource(body.dataSource),
   };
 }
 
@@ -193,6 +208,7 @@ async function briefing(rawBody) {
 
   const payload = {
     forecastDay: day,
+    dataSource: cleanSource(rawBody.dataSource),
     activeAlertsCount: alerts.length,
     alerts: alerts.map((a) => ({ zoneId: cleanStr(a.id || a.zoneId, 6), day: a.day, score: a.score })),
     criticalZones: topRisks.map((z) => ({
@@ -254,6 +270,7 @@ async function chat(rawBody) {
     stagedUnitsCount: num(context.stagedCount || 0, 0, 24, "stagedCount"),
     activeAlertsSummary: cleanList(context.alertsSummary, 8, 80),
     zoneConditions: context.zoneConditions || null,
+    dataSource: cleanSource(context.dataSource),
   };
 
   const rawText = await callGroqDirect(SYSTEM_PROMPT_CHAT, payload, true, 450);
@@ -276,4 +293,4 @@ async function chat(rawBody) {
   };
 }
 
-module.exports = { explain, briefing, chat, validate };
+module.exports = { explain, briefing, chat, validate, cleanSource };

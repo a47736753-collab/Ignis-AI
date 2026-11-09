@@ -1,0 +1,2338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IGNIS AI: Forest Fire Risk Predictor with Early Warning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+  --bg:#101820; --surface:#1B2935; --surface2:#263847; --ink:#EAF0F5; --muted:#A5B4C1; --line:#344653;
+  --accent:#62B6CB; --ember:#62B6CB; --low:#55B88A; --med:#E9B44C; --high:#FF765E;
+  --land:#33432F; --land2:#2A3A29; --water:#234457; --contour:rgba(234,240,245,.11); --road:#CBBF9F; --canopy:#3C6B45;
+  --on-accent:#08202A; --on-ember:#08202A; --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.4);
+  --peach:#111C26; --sky:#142431; --pink:#131F2A; --lemon:#101820;
+  --hero1:#0A1117; --hero2:#0F1B25; --hero3:#16303D; --hero4:#1D4150;
+  --sun:#A7E0EE; --sunA:#CFEFF7; --sunB:#62B6CB; --mist:#8DB8C6;
+  --tree1:#3E6A80; --tree2:#2B5266; --tree3:#1A3A4B; --tree4:#0D2230;
+  --footer-bg:#0B1218; --footer-ink:#A5B4C1;
+  --c1:#62B6CB; --c2:#8FD3E3; --c3:#4FA3B9; --c4:#62B6CB; --c5:#8FD3E3; --c6:#62B6CB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
+body{background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+h1,h2,h3,.serif{font-family:Sora,Manrope,system-ui,sans-serif;font-weight:700;letter-spacing:-.015em;line-height:1.08}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:20px;height:60px;max-width:1500px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:Sora,Manrope,system-ui,sans-serif;font-weight:800;font-size:20px;letter-spacing:.02em}
+.logo{width:30px;height:30px;border-radius:50%;background:var(--ember);display:grid;place-items:center}
+.logo svg{width:16px;height:16px;fill:var(--on-ember)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto}
+.nav a{padding:8px 12px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+.nav a[aria-current="page"]{color:var(--ink);background:var(--surface2)}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:12px;border:1px solid transparent;font-weight:700;font-size:15px;text-decoration:none;transition:transform .15s,filter .15s,background .15s}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--ember);color:var(--on-ember);box-shadow:0 6px 18px color-mix(in srgb,var(--ember) 28%,transparent)}
+.btn.primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn.ghost{border-color:color-mix(in srgb,var(--ink) 55%,transparent);color:var(--ink)}
+.btn.ghost:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+
+/* hero: arctic forest */
+.hero{position:relative;overflow:hidden;color:var(--ink);background:radial-gradient(900px 420px at 80% 6%,rgba(98,182,203,.20),transparent 70%),radial-gradient(700px 380px at 8% 36%,rgba(98,182,203,.09),transparent 70%),linear-gradient(180deg,#0A1117 0%,#0F1B25 34%,#16303D 70%,#1D4150 100%)}
+.hero::before{content:"";position:absolute;left:50%;bottom:20px;width:640px;height:640px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(167,224,238,.30) 0%,rgba(98,182,203,.12) 38%,transparent 68%);pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,24,32,.45) 0%,rgba(16,24,32,.04) 46%,rgba(16,24,32,.12) 100%),linear-gradient(90deg,rgba(16,24,32,.5),transparent 55%);pointer-events:none}
+.aurora{position:absolute;left:-10%;right:-10%;top:30px;height:280px;background:linear-gradient(100deg,transparent 8%,rgba(98,182,203,.20) 32%,rgba(85,184,138,.10) 54%,rgba(98,182,203,.12) 70%,transparent 90%);filter:blur(44px);opacity:.85;pointer-events:none;animation:aurora 40s ease-in-out infinite alternate}
+@keyframes aurora{from{transform:translateX(-4%) skewX(-6deg)}to{transform:translateX(5%) skewX(4deg)}}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.forest{position:absolute;left:0;right:0;bottom:0;width:100%;height:330px;pointer-events:none}
+.fl.l2{animation:sway 18s ease-in-out infinite alternate}.fl.l3{animation:sway 24s ease-in-out infinite alternate-reverse}.fl.l4{animation:sway 30s ease-in-out infinite alternate}
+@keyframes sway{from{transform:translateX(-5px)}to{transform:translateX(5px)}}
+.mist{position:absolute;border-radius:50%;filter:blur(46px);background:rgba(141,184,198,.22);opacity:.7;pointer-events:none;animation:mistdrift 60s ease-in-out infinite alternate}
+.mist.m1{width:560px;height:120px;left:-6%;bottom:150px}
+.mist.m2{width:680px;height:140px;right:-8%;bottom:90px;animation-duration:80s;animation-direction:alternate-reverse}
+@keyframes mistdrift{from{transform:translateX(-30px)}to{transform:translateX(110px)}}
+.hero .wrap{position:relative;z-index:1}
+.hero-grid{position:relative;display:grid;grid-template-columns:1fr 1.05fr;gap:48px;align-items:center;padding:84px 0 64px}
+.hero h1{font-size:clamp(42px,6.4vw,82px);margin-bottom:22px;font-weight:800;color:#fff;line-height:1.04}
+.hero h1 em{font-style:normal;font-weight:800;display:block;background:linear-gradient(90deg,#62B6CB,#A7E0EE);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{font-size:18px;color:var(--muted);max-width:500px;margin-bottom:32px}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-map{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(98,182,203,.12),0 0 70px rgba(98,182,203,.10);background:var(--land)}
+.hero-map svg{display:block;width:100%;height:auto}
+.hero-cap{position:absolute;left:14px;bottom:12px;right:14px;display:flex;justify-content:space-between;align-items:end;gap:10px;font-size:13px;color:var(--ink)}
+.hero-cap b{font-family:Sora,Manrope,system-ui,sans-serif;font-size:20px;display:block;line-height:1;margin-bottom:4px;color:#fff}
+.hero-cap .tag{background:rgba(16,24,32,.84);border:1px solid var(--line);padding:9px 13px;border-radius:12px;backdrop-filter:blur(8px)}
+.hero-map .dots{display:flex;gap:5px}
+.hero-map .dots i{width:20px;height:4px;border-radius:2px;background:rgba(234,240,245,.25);transition:background .4s}
+.hero-map .dots i.on{background:var(--accent)}
+.ticker{position:relative;display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:rgba(27,41,53,.82);backdrop-filter:blur(8px);overflow:hidden;margin-bottom:6px}
+.ticker .lab{flex:none;padding:10px 16px;font-size:13px;font-weight:700;background:linear-gradient(90deg,#8FD3E3,#62B6CB);color:#08202A;display:flex;align-items:center;gap:8px;position:relative;z-index:2}
+.ticker .lab i{width:8px;height:8px;border-radius:50%;background:#08202A;opacity:.85}
+.ticker .track{display:flex;gap:44px;white-space:nowrap;padding-left:28px;animation:marq 90s linear infinite;font-size:14px;color:var(--ink)}
+.ticker .track b{color:var(--accent)}
+@keyframes marq{to{transform:translateX(-50%)}}
+.stats{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.stats>div{background:rgba(27,41,53,.82);border:1px solid var(--line);border-radius:16px;padding:18px 20px 14px;backdrop-filter:blur(8px);box-shadow:inset 0 2px 0 rgba(98,182,203,.5)}
+.stats .n{font-family:Sora,Manrope,system-ui,sans-serif;font-size:clamp(32px,4vw,50px);font-weight:800;color:var(--accent);line-height:1}
+.stats p{font-size:14px;color:var(--muted);margin-top:8px;max-width:300px}
+.srcnote{position:relative;font-size:12px;color:var(--muted);padding:10px 0 270px}
+
+/* sections */
+section.s{padding:96px 0}
+section.s.alt{background:var(--surface2)}
+.s h2{font-size:clamp(30px,4.4vw,50px);margin-bottom:16px;max-width:760px}
+.s .intro{color:var(--muted);max-width:640px;margin-bottom:44px;font-size:17px}
+.split{display:grid;grid-template-columns:1fr 1.15fr;gap:64px;align-items:start}
+.rules>div{padding:22px 0 22px 20px;border-top:1px solid var(--line);position:relative}
+.rules>div::before{content:"";position:absolute;left:0;top:26px;width:4px;height:26px;border-radius:2px;background:var(--ember)}
+.rules h3{font-size:22px;margin-bottom:6px}
+.rules p{color:var(--muted);font-size:15px}
+.flow{list-style:none;display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.flow li{position:relative;padding-top:68px;text-align:center}
+.flow .node{position:absolute;top:0;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);display:grid;place-items:center;z-index:1}
+.flow li:last-child .node{background:var(--ember);border-color:var(--ember)}
+.flow li:last-child .node svg{stroke:var(--on-ember)}
+.flow .node svg{width:24px;height:24px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.flow li::before{content:"";position:absolute;top:25px;left:calc(50% + 30px);right:calc(-50% + 30px);height:2px;background:repeating-linear-gradient(90deg,var(--accent) 0 6px,transparent 6px 12px)}
+.flow li:last-child::before{display:none}
+.flow h3{font-size:18px;margin-bottom:6px}
+.flow p{font-size:14px;color:var(--muted);padding:0 6px}
+.legend-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:40px;font-size:14px;color:var(--muted)}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:-1px}
+.note{margin-top:32px;padding:18px 22px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 12px 12px 0;color:var(--muted);font-size:15px;max-width:780px}
+.note b{color:var(--ink)}
+.rows>div{display:grid;grid-template-columns:150px 230px 1fr auto;gap:18px;align-items:center;padding:18px 0;border-top:1px solid var(--line)}
+.rows h3{font-size:20px}
+.rows p{color:var(--muted);font-size:15px}
+.rows a{color:var(--accent);font-weight:700;text-decoration:none;font-size:14px}
+.rows a:hover{text-decoration:underline}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--muted);border:1px solid var(--line);width:max-content}
+.pill.obs{color:var(--accent)} .pill.fc{color:var(--med)} .pill.ill{color:var(--ember)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.metric .v{font-family:Sora,Manrope,system-ui,sans-serif;font-size:38px;font-weight:700;line-height:1}
+.metric .l{color:var(--muted);font-size:14px;margin-top:6px}
+.metric .w{font-size:12px;color:var(--muted);margin-top:8px}
+.lead-demo{display:grid;gap:14px;margin:8px 0 12px}
+.lrow{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;font-size:14px}
+.lbar{display:flex;height:42px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.lbar span{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;padding:0 8px;white-space:nowrap;overflow:hidden}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:32px}
+.two .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+.two h3{font-size:20px;margin-bottom:8px}
+.two ul{padding-left:20px;color:var(--muted);font-size:15px}
+.two li{margin:6px 0}
+footer{border-top:1px solid var(--line);padding:36px 0 48px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+
+/* dashboard */
+.dash{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;padding:14px;max-width:1560px;margin:0 auto;align-items:start}
+.dleft{display:flex;flex-direction:column;gap:12px;min-width:0}
+.summary{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font-size:14px;min-height:50px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:99px;background:var(--surface2);font-weight:700;font-size:13px}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.summary .grow{margin-left:auto;color:var(--muted)}
+.toolbar{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:8px 14px;font-size:14px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:700}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer}
+.chk input{accent-color:var(--accent);width:16px;height:16px}
+.search input{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;width:210px}
+.pipeline{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.run{background:var(--ember);color:var(--on-ember);border:0;border-radius:10px;padding:0 22px;font-weight:700;font-size:15px;min-height:48px;display:inline-flex;align-items:center;gap:8px;transition:filter .2s}.run:hover{filter:brightness(1.06)}
+.run:disabled{opacity:.6;cursor:progress}
+.stages{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;min-width:300px}
+.stage{padding:8px 10px;border-radius:10px;border:1px solid var(--line);font-size:13px;color:var(--muted);transition:all .25s;position:relative;overflow:hidden}
+.stage b{display:block;color:var(--ink);font-size:13px}
+.stage.active{border-color:var(--ember);color:var(--ink);background:color-mix(in srgb,var(--ember) 12%,transparent)}
+.stage.active::after{content:"";position:absolute;left:0;bottom:0;height:3px;background:var(--ember);animation:fill var(--ms,700ms) linear forwards}
+.stage.done{border-color:var(--accent)}
+.stage.done b::before{content:"✓ ";color:var(--accent)}
+@keyframes fill{from{width:0}to{width:100%}}
+.plog{width:100%;font-size:13px;color:var(--muted);min-height:20px}
+.mapwrap{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--land);touch-action:none;box-shadow:var(--shadow)}
+.mapwrap svg{display:block;width:100%;height:auto;cursor:grab;user-select:none;-webkit-user-select:none}
+.mapwrap svg.drag{cursor:grabbing}
+.zoomctl{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.zoomctl button{width:36px;height:36px;border:0;background:none;font-size:18px;font-weight:700}
+.zoomctl button+button{border-top:1px solid var(--line)}
+.legend{position:absolute;left:10px;bottom:10px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;max-width:calc(100% - 20px)}
+.badge-ill{position:absolute;left:10px;top:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--ember)}
+.compass{position:absolute;left:12px;top:48px;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--muted)}
+.compass::before{content:"";position:absolute;top:3px;width:0;height:0;border:4px solid transparent;border-bottom:8px solid var(--ember);border-top:0}
+.compass span{margin-top:10px}
+.hint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.hint div{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:18px 24px;border-radius:16px;text-align:center;max-width:300px;font-size:15px}
+.hint b{display:block;font-family:Sora,Manrope,system-ui,sans-serif;font-size:22px;margin-bottom:4px}
+.tip{position:fixed;z-index:80;pointer-events:none;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap}
+.zone{stroke-width:1.4;cursor:pointer;transition:fill .7s ease,fill-opacity .7s ease,stroke .7s ease}
+.zone:hover{stroke-width:3}
+.g-heat polygon{transition:fill-opacity .8s ease,fill .8s ease}
+.zlabel{font-size:13px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round;pointer-events:none;text-anchor:middle;font-family:Manrope,system-ui,sans-serif}
+.place{font-size:11px;fill:var(--muted);paint-order:stroke;stroke:var(--land);stroke-width:3px;pointer-events:none;font-family:Manrope,system-ui,sans-serif}
+.pulse{fill:none;stroke:var(--high);stroke-width:2;pointer-events:none;transform-box:fill-box;transform-origin:center;animation:pulse 2.2s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.4);opacity:.9}100%{transform:scale(1.7);opacity:0}}
+.sel{fill:none;stroke:var(--ink);stroke-width:3.5;stroke-dasharray:8 5;pointer-events:none;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-26}}
+.g-units{pointer-events:none}
+.ripple{fill:none;stroke:var(--accent);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:ripple 2.6s ease-out infinite}
+@keyframes ripple{0%{transform:scale(.3);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+.fire-spread{transform-box:fill-box;transform-origin:center;animation:spread 3.2s ease-out forwards}
+@keyframes spread{from{transform:scale(.2);opacity:.2}to{transform:scale(1.6);opacity:1}}
+.flame{transform-box:fill-box;transform-origin:50% 100%;animation:flicker .55s ease-in-out infinite alternate}
+@keyframes flicker{from{transform:scale(.92,1)}to{transform:scale(1.08,1.12)}}
+.timeline{display:grid;grid-template-columns:auto repeat(7,1fr);gap:8px;align-items:stretch}
+.play{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:0 16px;font-weight:700;font-size:14px;min-height:64px}
+.day{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 8px 10px;text-align:left;min-width:0;transition:border-color .15s}
+.day[aria-pressed="true"]{border-color:var(--ember);box-shadow:inset 0 0 0 1px var(--ember)}
+.day b{display:block;font-size:14px}
+.day span{display:block;font-size:12px;color:var(--muted);white-space:nowrap}
+.mini{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:6px;background:var(--surface2)}
+.mini i{display:block;height:100%}
+.dright{position:sticky;top:74px;max-height:calc(100vh - 92px);background:var(--surface);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;min-height:560px;overflow:hidden;box-shadow:var(--shadow)}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;border:0;background:none;padding:14px 6px;font-weight:700;font-size:14px;color:var(--muted);border-bottom:2px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ember)}
+.tabs .count{background:var(--high);color:var(--on-ember);border-radius:99px;font-size:12px;padding:1px 7px;margin-left:6px}
+.panel{padding:18px;overflow:auto;flex:1}
+.empty{color:var(--muted);text-align:center;padding:40px 12px;font-size:15px}
+.empty b{display:block;color:var(--ink);font-family:Sora,Manrope,system-ui,sans-serif;font-size:20px;margin-bottom:6px}
+.zhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.zhead h3{font-size:28px}
+.sev{display:inline-block;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:700;color:#1F1740}
+.sev.high{background:color-mix(in srgb,var(--high) 70%,#fff)} .sev.med{background:color-mix(in srgb,var(--med) 70%,#fff)} .sev.low{background:color-mix(in srgb,var(--low) 70%,#fff)}
+.bigscore{font-family:Sora,Manrope,system-ui,sans-serif;font-size:56px;font-weight:700;line-height:1;text-align:right}
+.bigscore small{display:block;font-family:Manrope,sans-serif;font-size:12px;font-weight:500;color:var(--muted);margin-top:4px}
+.blk{margin-top:18px}
+.blk h4{font-size:14px;margin-bottom:8px}
+.vars{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vars div{background:var(--surface2);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--muted)}
+.vars b{display:block;font-size:17px;color:var(--ink)}
+.drv{display:grid;grid-template-columns:104px 1fr 38px;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.drv .bar{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden}
+.drv .bar i{display:block;height:100%;background:var(--ember);border-radius:4px}
+.expl{font-size:14px;color:var(--muted);background:var(--surface2);border-radius:10px;padding:12px 14px}
+.action{border:1px solid var(--line);border-left:4px solid var(--ember);border-radius:10px;padding:12px 14px;font-size:14px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+svg.spark{width:100%;height:80px;display:block}
+.alert{border:1px solid var(--line);border-left:4px solid var(--high);border-radius:12px;padding:12px 14px;margin-bottom:10px;animation:slide .45s ease both}
+.alert.ack{opacity:.55;border-left-color:var(--line)}
+@keyframes slide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+.alert h5{font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.alert p{font-size:13px;color:var(--muted);margin:4px 0 8px}
+.alert .row{display:flex;gap:8px;flex-wrap:wrap}
+.alert button{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:5px 11px;font-size:13px;font-weight:700}
+.sim{font-size:12px;color:var(--muted);margin-bottom:12px}
+.act{background:var(--ember);color:var(--on-ember);border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:14px;transition:transform .2s,filter .2s}.act:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.06)}
+.act:disabled{opacity:.5;cursor:not-allowed}
+.act.sec{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.act.wide{width:100%;margin-top:6px}
+/* response steps */
+.rstep{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:16px 0;border-top:1px solid var(--line)}
+.rstep:first-of-type{border-top:0;padding-top:2px}
+.rn{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.rstep.active .rn{background:var(--ember);color:var(--on-ember);border-color:var(--ember)}
+.rstep.done .rn{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.rstep.locked{opacity:.5}
+.rb h4{font-size:16px;margin-bottom:4px;font-family:Sora,Manrope,system-ui,sans-serif}
+.rb p{font-size:13px;color:var(--muted);margin-bottom:10px}
+.meter{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin:4px 0 4px}
+.meter i{display:block;height:100%;background:var(--accent);transition:width .6s}
+.mlab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.pl{display:grid;grid-template-columns:62px 1fr auto;gap:8px;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line);align-items:center}
+.pl small{display:block;color:var(--muted);font-size:12px}
+.ok{color:var(--accent);font-weight:700}.no{color:var(--high);font-weight:700}.go{color:var(--ember);font-weight:700}
+.sms{background:var(--surface2);border-radius:16px 16px 16px 4px;padding:10px 13px;margin:8px 0;font-size:13px;animation:slide .45s ease both}
+.sms .sh{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.sms .hi{margin-top:4px;color:var(--muted)}
+.sms .sf{font-size:11px;color:var(--muted);margin-top:6px}
+.simzone{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;margin-bottom:8px}
+.race{margin-top:12px;display:grid;gap:12px}
+.race .rr{font-size:13px}
+.race .top2{display:flex;justify-content:space-between;margin-bottom:4px}
+.rbar{height:14px;border-radius:7px;background:var(--surface2);overflow:hidden}
+.rbar i{display:block;height:100%;width:0;border-radius:7px;transition-property:width;transition-timing-function:linear}
+.rbar i.react{background:var(--high)}.rbar i.prep{background:var(--accent)}
+.gain{margin-top:12px;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid var(--accent);font-size:14px}
+.gain b{font-family:Sora,Manrope,system-ui,sans-serif;font-size:24px;display:block}
+.fine{font-size:12px;color:var(--muted);margin-top:8px}
+
+
+/* explorer */
+.xp{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px;align-items:start}
+.xleft{display:flex;flex-direction:column;gap:10px}
+.xsteps{display:flex;flex-direction:column;gap:8px}
+.xstep{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}
+.xstep .ic{width:38px;height:38px;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;flex:none;transition:background .2s}
+.xstep .ic svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.xstep b{display:block;font-size:15px;line-height:1.2}
+.xstep small{font-size:12.5px;color:var(--muted);line-height:1.3;display:block}
+.xstep[aria-selected="true"]{border-color:var(--ember);box-shadow:inset 0 0 0 1px var(--ember)}
+.xstep[aria-selected="true"] .ic{border-color:var(--ember);background:var(--ember)}
+.xstep[aria-selected="true"] .ic svg{stroke:var(--on-ember)}
+.xstep.seen:not([aria-selected="true"]) .ic{background:var(--accent)}
+.xstep.seen:not([aria-selected="true"]) .ic svg{stroke:var(--on-accent)}
+.xstage{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;min-height:480px;box-shadow:var(--shadow)}
+.xstage.in{animation:fadeup .35s ease both}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.xstage h3{font-size:30px;margin-bottom:8px}
+.lede{color:var(--muted);margin-bottom:18px;max-width:600px;font-size:15.5px}
+.xnav{display:flex;justify-content:space-between;margin-top:22px;gap:10px;align-items:center}
+.srcs{display:grid;gap:10px;margin-bottom:10px}
+.src{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:opacity .2s}
+.src.off{opacity:.4}
+.src input{accent-color:var(--accent);width:18px;height:18px;margin-top:3px;flex:none}
+.src b{font-size:15px;margin-right:8px}
+.src small{display:block;font-size:13px;color:var(--muted)}
+.sl{display:grid;grid-template-columns:130px 1fr 64px;gap:12px;align-items:center;font-size:14px;margin:9px 0}
+.sl input[type=range]{width:100%;accent-color:var(--ember)}
+.sl b{text-align:right}
+.pre{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.chipbtn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:7px 13px;font-size:13px;font-weight:700}
+.chipbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gauge{position:relative;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--low) 0 40%,var(--med) 40% 65%,var(--high) 65% 100%);margin:18px 0 6px}
+.gauge i{position:absolute;top:-6px;width:5px;height:26px;border-radius:3px;background:var(--ink);box-shadow:0 0 0 2px var(--surface);transition:left .25s;transform:translateX(-50%)}
+.ptab{width:100%;border-collapse:collapse;font-size:14px}
+.ptab th{font-size:12px;color:var(--muted);text-align:left;padding:6px 8px;font-weight:700}
+.ptab td{padding:10px 8px;border-top:1px solid var(--line);vertical-align:middle}
+.bad{color:var(--high);font-weight:700}.goodc{color:var(--accent);font-weight:700}.dim{color:var(--muted)}
+.nb{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;width:80px;display:inline-block;vertical-align:middle;margin-right:6px}
+.nb i{display:block;height:100%;background:var(--ember)}
+.tgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:6px 0 14px}
+.tile{--c:var(--low);aspect-ratio:1.35;border-radius:12px;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 26%,var(--surface));display:grid;place-items:center;font-weight:800;font-size:20px;font-family:Sora,Manrope,system-ui,sans-serif;position:relative;transition:background .3s,border-color .3s}
+.tile.med{--c:var(--med)}.tile.high{--c:var(--high)}
+.tile small{position:absolute;left:8px;top:5px;font:700 11px Manrope,sans-serif;color:var(--muted)}
+.tile.ctr{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.acts div{background:var(--surface2);border-radius:12px;padding:12px 14px;font-size:14px}
+.acts b{display:block;font-family:Sora,Manrope,system-ui,sans-serif;font-size:17px;margin-bottom:2px}
+/* evidence */
+.evtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.evtabs button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:9px 18px;font-weight:700;font-size:14px;color:var(--muted)}
+.evtabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.evbanner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted);padding:12px 16px;border:1px dashed var(--line);border-radius:12px;margin-bottom:18px;background:var(--surface)}
+.evgrid{display:grid;grid-template-columns:1fr 1.1fr;gap:18px}
+.evcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.evcard h4{font-family:Sora,Manrope,system-ui,sans-serif;font-size:20px;margin-bottom:10px}
+.auc{font-family:Sora,Manrope,system-ui,sans-serif;font-size:46px;font-weight:700;line-height:1}
+.cm{display:grid;grid-template-columns:84px 1fr 1fr;gap:6px;font-size:13px;margin:12px 0}
+.cm .h{color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;text-align:center}
+.cm .c{border-radius:12px;padding:12px 8px;text-align:center}
+.cm .c b{display:block;font-family:Sora,Manrope,system-ui,sans-serif;font-size:28px;line-height:1.1}
+.cm .c.good{background:color-mix(in srgb,var(--low) 18%,transparent);border:1px solid var(--low)}
+.cm .c.bad{background:color-mix(in srgb,var(--high) 14%,transparent);border:1px solid var(--high)}
+.mchips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.mchips div{background:var(--surface2);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--muted)}
+.mchips b{display:block;font-size:22px;color:var(--ink);font-family:Sora,Manrope,system-ui,sans-serif}
+.evstats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.evstat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.evstat b{font-family:Sora,Manrope,system-ui,sans-serif;font-size:36px;line-height:1;display:block;margin-bottom:6px}
+.evstat span{font-size:13px;color:var(--muted)}
+.itab{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.itab th{font-size:12px;color:var(--muted);font-weight:700;text-align:left;padding:8px}
+.itab td{padding:9px 8px;border-top:1px solid var(--line)}
+.scn{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{font-family:Manrope,system-ui,sans-serif;fill:var(--muted);font-size:11px}
+.plan{counter-reset:pl;list-style:none;display:grid;gap:10px}
+.plan li{counter-increment:pl;display:grid;grid-template-columns:30px 1fr;gap:12px;font-size:15px;color:var(--muted)}
+.plan li::before{content:counter(pl);width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink)}
+.plan b{color:var(--ink)}
+@media (max-width:860px){
+  .xp,.evgrid{grid-template-columns:1fr}
+  .xsteps{flex-direction:row;overflow-x:auto}
+  .xstep{flex:none;width:auto}.xstep small{display:none}
+  .xstage{padding:20px}
+  .evstats{grid-template-columns:1fr 1fr}
+  .mchips{grid-template-columns:1fr 1fr}
+  .sl{grid-template-columns:100px 1fr 56px}
+  .acts{grid-template-columns:1fr}
+  .ptab{font-size:12.5px}
+}
+
+section.s,footer{position:relative}
+section.s.t-sky{background:var(--sky);--sc:var(--sky)}section.s.t-peach{background:var(--peach);--sc:var(--peach)}section.s.t-pink{background:var(--pink);--sc:var(--pink)}
+footer{background:var(--lemon);--sc:var(--lemon);margin-top:0}
+.tl{position:absolute;left:0;right:0;top:-79px;width:100%;height:80px;pointer-events:none;fill:var(--sc)}
+@media (max-width:860px){.forest{height:240px}.srcnote{padding-bottom:190px}}
+main{animation:fadeup .55s ease both}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .9s ease}
+.rv.in{opacity:1;transform:none}
+.rows>div{transition:background .25s,transform .25s;border-radius:12px}
+.rows>div:hover{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.evcard,.evstat,.metric,.two .card{transition:transform .3s,box-shadow .3s}
+.evcard:hover,.evstat:hover,.two .card:hover{box-shadow:var(--shadow)}
+
+.xstep{transition:transform .2s,border-color .2s}
+.xstep[aria-selected="true"] .ic{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.day{transition:transform .2s,border-color .2s}
+@keyframes bob2{50%{transform:translateY(-8px)}}
+.panel.pin>*{animation:fadeup .45s cubic-bezier(.2,.7,.2,1) both}
+.panel.pin>*:nth-child(2){animation-delay:.06s}.panel.pin>*:nth-child(3){animation-delay:.12s}.panel.pin>*:nth-child(4){animation-delay:.18s}.panel.pin>*:nth-child(5){animation-delay:.24s}.panel.pin>*:nth-child(6){animation-delay:.3s}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.8s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.mini i{transition:width .6s ease}
+.aibox{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted)}
+.aibox b{display:block;color:var(--ink);margin-bottom:2px;font-size:14px}
+.aiload{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;margin-bottom:8px}
+.aiload i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:bounce 1s ease-in-out infinite}
+.aiload i:nth-child(2){animation-delay:.15s}.aiload i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-6px);opacity:1}}
+.ailist{padding-left:18px;font-size:13.5px;color:var(--muted);margin:4px 0 8px}
+.aitag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent);color:var(--on-accent);margin-bottom:6px}
+
+
+/* ===== Arctic Command ===== */
+body{background:var(--bg);color:var(--ink)}
+h1,h2,h3,.serif{letter-spacing:-.022em;color:#fff}
+.top{background:rgba(16,24,32,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{background:linear-gradient(135deg,#9BDCEB,#62B6CB);box-shadow:0 0 0 4px rgba(98,182,203,.15)}
+.logo svg{fill:#08202A}
+.brand{color:#fff;letter-spacing:.04em}
+.nav a:hover{color:#fff}.nav a[aria-current="page"]{color:#fff;background:var(--surface2)}
+.btn.primary,.run,.act{background:linear-gradient(135deg,#8FD3E3,#62B6CB 55%,#4FA3B9);color:#08202A;font-weight:700}
+.btn.primary{box-shadow:0 8px 28px rgba(98,182,203,.30)}
+.run{box-shadow:0 6px 22px rgba(98,182,203,.25)}
+.btn.ghost{border-color:var(--line);color:var(--ink);background:rgba(27,41,53,.55)}
+.btn.ghost:hover{background:var(--surface2);border-color:#4B6376}
+.act.sec,#xtour{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.act.sec:hover:not(:disabled),#xtour:hover{background:#2E4354}
+.s h2::after{content:"";display:block;width:56px;height:4px;border-radius:2px;margin-top:14px;background:linear-gradient(90deg,#62B6CB,#A7E0EE)}
+.s .intro{color:var(--muted)}
+.rules>div::before{background:var(--accent)}
+.note{background:var(--surface);border-left-color:var(--accent);color:var(--muted)}
+.card,.evcard,.evstat,.metric,.two .card,.xstage{background:var(--surface);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.28)}
+.evcard:hover,.evstat:hover,.two .card:hover{border-color:#4B6376;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 36px rgba(0,0,0,.36)}
+.xstep,.day,.play,.src,.pipeline,.summary{background:var(--surface);border-color:var(--line)}
+.xstep:nth-child(n){--xc:var(--accent);--xt:#08202A}.xstep:nth-child(6){--xc:var(--high)}
+.xstep .ic{border-color:var(--xc)}.xstep .ic svg{stroke:var(--xc)}
+.xstep[aria-selected="true"]{border-color:var(--xc);box-shadow:inset 0 0 0 1px var(--xc),0 0 24px rgba(98,182,203,.12)}
+.xstep[aria-selected="true"] .ic{border-color:var(--xc);background:var(--xc)}.xstep[aria-selected="true"] .ic svg{stroke:var(--xt)}
+.xstep.seen:not([aria-selected="true"]) .ic{background:var(--xc)}.xstep.seen:not([aria-selected="true"]) .ic svg{stroke:var(--xt)}
+.pill.obs{background:rgba(85,184,138,.16);color:#9ADBBC;border-color:rgba(85,184,138,.35)}
+.pill.fc{background:rgba(233,180,76,.14);color:#F0CB7E;border-color:rgba(233,180,76,.35)}
+.pill.ill{background:rgba(255,118,94,.14);color:#FFA190;border-color:rgba(255,118,94,.35)}
+.sev{color:#101820}.sev.high{background:var(--high)}.sev.med{background:var(--med)}.sev.low{background:var(--low)}
+.tabs .count{background:var(--high);color:#101820}
+.dright{background:var(--surface);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.dright::before{content:"";display:block;flex:none;height:3px;background:linear-gradient(90deg,#62B6CB,#A7E0EE,#62B6CB)}
+.seg{background:var(--surface);border-color:var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#08202A}
+.evtabs button{background:var(--surface);color:var(--muted);border-color:var(--line)}
+.evtabs button:hover{color:#fff;border-color:#4B6376}
+.evtabs button[aria-selected="true"]{background:var(--accent);color:#08202A;border-color:var(--accent)}
+.evbanner{background:var(--surface);border-color:var(--line)}
+.mapwrap{background:var(--land);border-color:var(--line);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.zoomctl,.legend,.badge-ill,.compass{background:rgba(16,24,32,.84);border-color:var(--line);backdrop-filter:blur(8px)}
+.badge-ill{color:var(--accent)}
+.legend{color:var(--muted)}
+.hint div{background:rgba(16,24,32,.88);border:1px solid var(--line);backdrop-filter:blur(8px)}
+.tip{background:var(--surface2);border-color:var(--line);color:var(--ink)}
+.zone{stroke-width:1.5}
+.zlabel{font-size:12px;font-weight:700;fill:var(--ink);stroke:#0B1218;stroke-width:3px}
+.place{fill:#EAF0F5;stroke:#0B1218;stroke-width:3px}
+.sel{stroke:#fff;filter:drop-shadow(0 0 6px rgba(98,182,203,.8))}
+.g-roads{pointer-events:none}
+footer{background:var(--footer-bg);--sc:var(--footer-bg);color:var(--footer-ink);border-top:1px solid var(--line);padding-top:48px}
+footer .serif{color:#fff!important}
+.ticker .lab{position:relative;z-index:2}
+.evcard>svg text{font-family:Manrope,system-ui,sans-serif;fill:var(--muted);font-size:10px}
+input[type=range]{accent-color:var(--accent)}
+::selection{background:rgba(98,182,203,.35)}
+
+/* auth components */
+.auth-wrap{position:relative;margin-left:8px;display:flex;align-items:center}
+.btn-auth{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px;font-weight:600;transition:all .15s}
+.btn-auth:hover{background:var(--surface2);border-color:var(--accent);color:#fff}
+.auth-avatar{width:22px;height:22px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;flex:none}
+.auth-avatar svg{width:13px;height:13px;fill:var(--muted)}
+.auth-avatar.logged{background:var(--accent);color:var(--on-accent);font-weight:800;font-size:11px}
+.auth-avatar.logged svg{display:none}
+.auth-label{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-menu{position:absolute;top:calc(100% + 8px);right:0;width:240px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.5);padding:12px;z-index:90;animation:fadeup .2s ease both}
+.auth-menu-head{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
+.auth-menu-head b{display:block;font-size:14px;color:#fff}
+.auth-menu-head span{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.auth-menu-status{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-bottom:10px;padding:4px 8px;background:var(--surface2);border-radius:6px}
+.auth-menu-item{width:100%;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;transition:background .15s}
+.auth-menu-item:hover{background:color-mix(in srgb,var(--high) 20%,var(--surface2));color:#FFA190;border-color:var(--high)}
+
+/* auth modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,17,23,.78);backdrop-filter:blur(8px);display:grid;place-items:center;z-index:100;padding:16px}
+.modal-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.6);padding:24px;position:relative;animation:pop .25s ease both}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--muted);display:grid;place-items:center;font-size:18px;cursor:pointer}
+.modal-close:hover{color:#fff;background:var(--surface2)}
+.modal-tabs{display:flex;border-bottom:1px solid var(--line);margin:16px 0 20px}
+.modal-tabs button{flex:1;background:none;border:0;padding:10px 0;font-size:14px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer}
+.modal-tabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--accent)}
+.form-grp{margin-bottom:14px}
+.form-grp label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.form-grp input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:14px}
+.form-grp input:focus{border-color:var(--accent);outline:none}
+.auth-msg{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none}
+.auth-msg.err{background:rgba(255,118,94,.16);border:1px solid rgba(255,118,94,.4);color:#FFA190;display:block}
+.auth-msg.ok{background:rgba(85,184,138,.16);border:1px solid rgba(85,184,138,.4);color:#9ADBBC;display:block}
+.auth-div{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:16px 0}
+.auth-div::before,.auth-div::after{content:"";flex:1;height:1px;background:var(--line)}
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font-weight:700;font-size:14px;transition:background .15s;cursor:pointer}
+.btn-google:hover{background:#2E4354;border-color:#4B6376}
+.btn-google svg{width:18px;height:18px;flex:none}
+.btn-guest{width:100%;margin-top:10px;background:none;border:1px dashed var(--line);color:var(--muted);padding:9px;border-radius:10px;font-size:13px;cursor:pointer}
+.btn-guest:hover{color:var(--ink);border-color:var(--accent)}
+
+/* Briefing & Chat styles */
+.tabs button{padding:12px 3px;font-size:12.5px}
+.chat-wrap{display:flex;flex-direction:column;gap:10px;height:100%}
+.chat-ctx{display:flex;gap:6px;flex-wrap:wrap;padding:7px 10px;background:var(--surface2);border-radius:10px;font-size:11.5px;color:var(--muted);align-items:center}
+.chat-ctx b{color:var(--ink)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
+.chip-prompt{border:1px solid var(--line);background:var(--surface2);color:var(--muted);border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600;text-align:left;transition:all .15s;cursor:pointer}
+.chip-prompt:hover{background:color-mix(in srgb,var(--accent) 15%,var(--surface2));color:#fff;border-color:var(--accent)}
+.chat-feed{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:360px;overflow-y:auto;padding-right:4px}
+.chat-bubble{border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45;animation:slide .3s ease both}
+.chat-bubble.user{background:var(--surface2);border:1px solid var(--line);margin-left:24px;color:#fff}
+.chat-bubble.assistant{background:color-mix(in srgb,var(--surface2) 50%,var(--surface));border:1px solid var(--line);border-left:3px solid var(--accent);margin-right:6px;color:var(--ink)}
+.chat-bubble .act-callout{margin-top:6px;padding:6px 8px;background:rgba(98,182,203,.12);border-radius:6px;font-size:12px;color:var(--accent);font-weight:600}
+.chat-bubble .bubble-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:11px;color:var(--muted)}
+.btn-copy{background:none;border:1px solid var(--line);color:var(--muted);font-size:11px;cursor:pointer;padding:2px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:4px}
+.btn-copy:hover{color:#fff;background:var(--surface2);border-color:var(--accent)}
+.chat-form{display:flex;gap:8px;margin-top:auto}
+.chat-form input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:13.5px}
+.chat-form input:focus{border-color:var(--accent);outline:none}
+.chat-form button{flex:none;background:var(--accent);color:var(--on-accent);border:0;border-radius:10px;padding:0 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+.chat-form button:disabled{opacity:.5;cursor:not-allowed}
+
+.briefing-box{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.briefing-box h5{font-size:17px;color:#fff;margin-bottom:4px;font-family:Sora,Manrope,system-ui,sans-serif}
+.briefing-bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.briefing-history{display:grid;gap:8px;margin-top:14px}
+.briefing-item{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+
+/* SOP Checklist & Tactical Explainability */
+.sop-checklist{margin:10px 0;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.sop-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.sop-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink);padding:4px 0;cursor:pointer;user-select:none}
+.sop-item input{accent-color:var(--accent);width:15px;height:15px;flex:none}
+.sop-item.done{color:var(--muted);text-decoration:line-through}
+.tactical-badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px;letter-spacing:.02em;margin-bottom:6px}
+.hazard-pills{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0 10px}
+
+@media (max-width:1020px){
+  .hero-grid{grid-template-columns:1fr;padding-top:48px}
+  .hero-map{transform:none}
+  .dash{grid-template-columns:1fr}
+  .dright{position:static;max-height:none;min-height:0}
+  .split{grid-template-columns:1fr;gap:24px}
+}
+@media (max-width:860px){
+  .flow{grid-template-columns:1fr;gap:20px}
+  .flow li{text-align:left;padding:0 0 0 70px;min-height:52px}
+  .flow .node{left:0;transform:none}
+  .flow li::before{display:none}
+  .rows>div{grid-template-columns:1fr;gap:6px}
+  .metrics,.two{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .stages{grid-template-columns:1fr 1fr}
+  .timeline{grid-template-columns:repeat(7,1fr)}
+  .play{grid-column:1/-1;min-height:44px}
+  .lrow{grid-template-columns:1fr}
+  .day span.dt{display:none}
+  .brand span.t{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#home" aria-label="IGNIS AI home">
+      <span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 3.5 6 5.5 6 11a6 6 0 0 1-12 0c0-2.2 1-3.6 2.4-4.8.1 2 1 3 2.2 3.2-.6-3.2-.4-6.2 1.4-9.4z"/></svg></span>
+      <span class="t">IGNIS AI</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#intelligence" data-nav="intelligence">Intelligence</a>
+      <a href="#how" data-nav="how">How it works</a>
+      <a href="#evidence" data-nav="evidence">Evidence</a>
+    </nav>
+    <div class="auth-wrap" id="authWrap">
+      <button type="button" class="btn-auth" id="btnAuthOpen" aria-label="User profile and authentication">
+        <span class="auth-avatar" id="authAvatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+        <span class="auth-label" id="authLabel">Sign In</span>
+      </button>
+      <div class="auth-menu" id="authMenu" hidden>
+        <div class="auth-menu-head">
+          <b id="authUserName">Officer</b>
+          <span id="authUserEmail">guest@ignis.ai</span>
+        </div>
+        <div class="auth-menu-status" id="authSupabaseStatus">
+          <i class="sw" style="background:var(--accent)"></i> <span id="authStatusText">Guest Mode</span>
+        </div>
+        <button type="button" class="auth-menu-item" id="btnSignOut">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LANDING ============ -->
+<main id="home">
+  <section class="hero">
+    <span class="aurora" aria-hidden="true"></span>
+    <canvas id="embers" aria-hidden="true"></canvas>
+    <svg class="forest" id="forest" viewBox="0 0 1440 330" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+    <span class="mist m1"></span><span class="mist m2"></span>
+    
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <h1>Predict before <em>the flames.</em></h1>
+          <p class="lead">IGNIS AI scores every zone of a forest region up to seven days ahead, then helps a fire station act on it: plan resources, stage trucks, warn villages, and test the plan against a simulated fire.</p>
+          <div class="cta">
+            <a class="btn primary" href="#intelligence">Explore Intelligence</a>
+            <a class="btn ghost" href="#how">Discover how it works</a>
+          </div>
+        </div>
+        <div class="hero-map" aria-label="Animated preview of a seven-day risk forecast">
+          <svg id="heroMap" viewBox="0 0 900 600" role="img" aria-label="Risk map preview"></svg>
+          <div class="hero-cap">
+            <div class="tag"><b id="heroDay">Day 1</b><span>Forecast preview, illustrative zones</span></div>
+            <div class="dots" id="heroDots"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ticker" aria-label="Simulated alert feed"><div class="lab"><i></i>Simulated alerts</div><div class="track" id="track"></div></div>
+      <div class="stats" id="stats">
+        <div><div class="n" data-count="3.7" data-dec="1" data-suf="M km²">0</div><p>Land burned worldwide in the 2024–25 fire season, an area larger than India.</p></div>
+        <div><div class="n" data-count="140" data-pre="$" data-suf="B+">0</div><p>Estimated damage from the 2025 Eaton and Palisades fires, which forced 150,000+ evacuations.</p></div>
+        <div><div class="n" data-count="9" data-suf="%">0</div><p>Rise in wildfire carbon emissions in 2024–25 against the historical average.</p></div>
+      </div>
+      <p class="srcnote">Source: State of Wildfires 2024–25 report (Earth System Science Data, 2025), as cited in our team deck.</p>
+    </div>
+  </section>
+
+  <section class="s">
+    <div class="wrap split">
+      <div>
+        <h2>Fire departments find out too late.</h2>
+        <p class="intro" style="margin-bottom:0">Most systems detect a fire after it ignites. Warnings cover whole regions, so nobody knows which patch of forest is dangerous on a given day.</p>
+      </div>
+      <div class="rules">
+        <div><h3>No pre-positioning</h3><p>Trucks, tankers and crews cannot be staged near danger zones ahead of time.</p></div>
+        <div><h3>Regional, not local</h3><p>Existing warnings cover broad areas, not the specific grid zone at risk.</p></div>
+        <div><h3>No lead time</h3><p>Communities get little or no notice to prepare or evacuate.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s t-sky" id="sec-how">
+    <div class="wrap">
+      <h2>From raw data to a truck in position.</h2>
+      <p class="intro">One loop, six steps. Click a step, or play the tour. Each step has a live demo that uses the same scoring logic as the dashboard.</p>
+      <div class="xp" id="xp">
+        <div class="xleft">
+          <button class="act sec" id="xtour" type="button">▶ Play the tour</button>
+          <div class="xsteps" id="xsteps" role="tablist" aria-label="Pipeline steps"></div>
+        </div>
+        <div class="xstage" id="xstage" role="tabpanel" aria-live="polite"></div>
+      </div>
+      <div class="legend-row">
+        <span><i class="sw" style="background:var(--low)"></i>Low risk, score under 40</span>
+        <span><i class="sw" style="background:var(--med)"></i>Medium risk, 40 to 64</span>
+        <span><i class="sw" style="background:var(--high)"></i>High risk, 65 and above, raises an alert</span>
+      </div>
+      <div class="note"><b>What does what.</b> The trained machine-learning model produces every risk score. A language-model layer (Groq, planned) will only turn those scores into plain-language explanations. It never invents a prediction.</div>
+    </div>
+  </section>
+
+  <section class="s t-peach" id="sec-data">
+    <div class="wrap">
+      <h2>Built on open earth-observation data.</h2>
+      <p class="intro">Every input has a named source and a type, so judges can tell observations from forecasts from model output.</p>
+      <div class="rows">
+        <div><span class="pill obs">Observed</span><h3>NASA FIRMS</h3><p>Historical fire detections that show recurring hotspots and seasonal patterns.</p><a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">firms.modaps.eosdis.nasa.gov</a></div>
+        <div><span class="pill obs">Observed</span><h3>Copernicus Sentinel-2</h3><p>Satellite imagery used to compute NDVI, a measure of how green or dry vegetation is.</p><a href="https://dataspace.copernicus.eu/" target="_blank" rel="noopener">dataspace.copernicus.eu</a></div>
+        <div><span class="pill fc">Forecast</span><h3>Open-Meteo</h3><p>Temperature, humidity and wind speed forecasts for the next seven days.</p><a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a></div>
+        <div><span class="pill obs">Observed</span><h3>Copernicus ERA5</h3><p>Climate reanalysis used for long-run weather context when training the model.</p><a href="https://cds.climate.copernicus.eu/" target="_blank" rel="noopener">cds.climate.copernicus.eu</a></div>
+        <div style="border-bottom:1px solid var(--line)"><span class="pill ill">Illustrative</span><h3>This demo</h3><p>Zones, weather values and scores on this site are generated deterministically, so the same click always gives the same result.</p><span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s t-pink" id="sec-evidence">
+    <div class="wrap">
+      <h2>Does it work? The evidence.</h2>
+      <p class="intro">Four views of how we judge the system: how accurate the scores are, whether it warns early enough on past fires, what that is worth to a fire station, and where it falls short.</p>
+      <div class="evtabs" id="evTabs" role="tablist" aria-label="Evidence views">
+        <button type="button" role="tab" data-evtab="perf">Model accuracy</button>
+        <button type="button" role="tab" data-evtab="back">Backtest replay</button>
+        <button type="button" role="tab" data-evtab="impact">Impact</button>
+        <button type="button" role="tab" data-evtab="limits">Limits and next steps</button>
+      </div>
+      <div class="evbanner" id="evBanner"></div>
+      <div id="evBody"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div><b class="serif" style="font-size:18px;color:var(--ink)">IGNIS AI</b><br>Forest Fire Risk Predictor with Early Warning<br>IGC Hackathon 2026, track: AI for Climate and Disaster Resilience</div>
+      <div>Team: Parth Utage, Ahmad Sarve, Atharva Deshpande, Harsh Sarode, Sanskar Dhobe<br>Demo data is illustrative.</div>
+    </div>
+  </footer>
+</main>
+
+<!-- ============ DASHBOARD ============ -->
+<main id="intelligence" hidden>
+  <div class="dash">
+    <div class="dleft">
+      <div class="summary" id="summary" aria-live="polite"></div>
+
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Map layer" id="modes">
+          <button type="button" data-mode="risk" aria-pressed="true">Fire risk</button>
+          <button type="button" data-mode="ndvi" aria-pressed="false">Vegetation dryness</button>
+          <button type="button" data-mode="hum" aria-pressed="false">Humidity</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="lyPlaces" checked> Roads and villages</label>
+        <label class="chk"><input type="checkbox" id="lyTerrain" checked> Terrain lines</label>
+        <div class="search"><input id="q" list="places" placeholder="Search a zone or village" aria-label="Search a zone or village" autocomplete="off"><datalist id="places"></datalist></div>
+      </div>
+
+      <div class="pipeline">
+        <button class="run" id="run" type="button">Run AI forecast</button>
+        <div class="stages" id="stages"></div>
+        <div class="plog" id="plog">Press Run AI forecast to score every zone for the next 7 days.</div>
+      </div>
+
+      <div class="mapwrap" id="mapwrap">
+        <svg id="map" viewBox="0 0 900 600" role="application" aria-label="Forest zone risk map. Click a zone to see details."></svg>
+        <div class="badge-ill">Illustrative demo region</div>
+        <div class="compass" aria-hidden="true"><span>N</span></div>
+        <div class="zoomctl">
+          <button type="button" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" id="zout" aria-label="Zoom out">−</button>
+          <button type="button" id="zreset" aria-label="Reset view" style="font-size:13px">⟲</button>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="hint" id="hint"><div><b>No forecast yet</b>Run the AI forecast to light up the zones.</div></div>
+      </div>
+
+      <div class="timeline" id="timeline" role="group" aria-label="Forecast day"></div>
+    </div>
+
+    <aside class="dright">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tabZone" aria-selected="true">Zone</button>
+        <button type="button" role="tab" id="tabAlerts" aria-selected="false">Alerts<span class="count" id="alertCount" hidden>0</span></button>
+        <button type="button" role="tab" id="tabResp" aria-selected="false">Response</button>
+        <button type="button" role="tab" id="tabBriefing" aria-selected="false">Briefing</button>
+        <button type="button" role="tab" id="tabAsk" aria-selected="false">Ask AI</button>
+      </div>
+      <div class="panel" id="panel" aria-live="polite"></div>
+    </aside>
+  </div>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-backdrop" id="authModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button type="button" class="modal-close" id="btnAuthClose" aria-label="Close modal">&times;</button>
+    <h3 id="authTitle" style="font-size:22px;color:#fff">Station Authentication</h3>
+    <p class="fine" style="margin-top:4px" id="authSubtitle">Secure officer access via Supabase</p>
+
+    <div class="modal-tabs" role="tablist">
+      <button type="button" id="tabSignIn" aria-selected="true">Sign In</button>
+      <button type="button" id="tabSignUp" aria-selected="false">Create Account</button>
+    </div>
+
+    <div id="authNotice" class="auth-msg"></div>
+
+    <form id="authForm">
+      <div class="form-grp">
+        <label for="authEmail">Officer Email</label>
+        <input type="email" id="authEmail" required placeholder="officer@station.gov" autocomplete="email">
+      </div>
+      <div class="form-grp">
+        <label for="authPassword">Password</label>
+        <input type="password" id="authPassword" required placeholder="••••••••" autocomplete="current-password" minlength="6">
+      </div>
+      <button type="submit" class="btn primary" id="btnAuthSubmit" style="width:100%;justify-content:center;margin-top:8px">Sign In</button>
+    </form>
+
+    <div class="auth-div">or continue with</div>
+
+    <button type="button" class="btn-google" id="btnGoogleAuth">
+      <svg viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3 0-.8.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 12s.7 2.3 1.9 4.7l3.7-1.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
+      <span>Sign in with Google</span>
+    </button>
+
+    <button type="button" class="btn-guest" id="btnContinueGuest">
+      Continue as Guest Officer (Demo mode)
+    </button>
+  </div>
+</div>
+
+<!-- ============ DATA LAYER (pure, swappable for the real model and database) ============ -->
+<script id="data">
+/* To show real results on the Evidence section, set VALIDATION = {labels:[0/1,...], scores:[0..100,...]} from your held-out set,
+   and BACKTEST = [{name, zone, scores:[8 daily scores from D-7 to D0], note}]. While null, clearly labelled sample data is shown. */
+var VALIDATION = null;
+var BACKTEST = null;
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function clamp(x,a,b){a=a===undefined?0:a;b=b===undefined?1:b;return Math.min(b,Math.max(a,x))}
+
+var MW=900, MH=600, COLS=6, ROWS=4, THRESH_HIGH=65, THRESH_MED=40, KM_PER_UNIT=0.04;
+var W={temp:.24,hum:.26,wind:.12,ndvi:.22,hist:.16};
+var DAY_TEMP=[0,1.5,3,5,6.5,4.5,2], DAY_HUM=[0,-3,-7,-11,-14,-9,-4], DAY_WIND=[0,1,3,4,6,3,1];
+var VILLAGES=[{n:"Kadwa",x:170,y:140},{n:"Ranjani",x:470,y:300},{n:"Sitapur",x:720,y:130},{n:"Mohgaon",x:290,y:470},{n:"Bhilwadi",x:790,y:480}];
+var STATIONS=[{n:"Station 1, Sitapur",x:650,y:215},{n:"Station 2, Mohgaon",x:560,y:520}];
+var POOL={tankers:12,crews:6};
+var SIM_ASSUME={detect:20,dispatch:5,speed:30,setup:3,local:4};
+
+function sev(s){return s>=THRESH_HIGH?"high":s>=THRESH_MED?"med":"low"}
+function sevName(s){return {high:"High risk",med:"Medium risk",low:"Low risk"}[sev(s)]}
+
+function buildZones(){
+  var rnd=mulberry32(2026), pts=[], r, c, zs=[];
+  for(r=0;r<=ROWS;r++){pts[r]=[];for(c=0;c<=COLS;c++){
+    var x=c*MW/COLS, y=r*MH/ROWS;
+    if(c!==0&&c!==COLS) x+=(rnd()-.5)*46;
+    if(r!==0&&r!==ROWS) y+=(rnd()-.5)*40;
+    pts[r][c]=[x,y];
+  }}
+  for(r=0;r<ROWS;r++)for(c=0;c<COLS;c++){
+    var q=[pts[r][c],pts[r][c+1],pts[r+1][c+1],pts[r+1][c]];
+    var cx=(q[0][0]+q[1][0]+q[2][0]+q[3][0])/4, cy=(q[0][1]+q[1][1]+q[2][1]+q[3][1])/4;
+    var u=(c+.5)/COLS, v=(r+.5)/ROWS;
+    var dry=clamp(.12+.5*u+.22*v+(rnd()-.5)*.2);
+    zs.push({
+      id:String.fromCharCode(65+r)+(c+1), poly:q.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),
+      cx:cx, cy:cy,
+      base:{ temp:29+5*dry+(rnd()-.5)*2, hum:58-22*dry+(rnd()-.5)*4, wind:8+6*rnd()+4*v, ndvi:.78-.42*dry+(rnd()-.5)*.04, hist:clamp(dry*.7+rnd()*.35) }
+    });
+  }
+  return zs;
+}
+var ZONES=buildZones();
+function zoneById(id){return ZONES.filter(function(z){return z.id===id})[0]}
+
+function scoreFrom(t,h,w,ndvi,hist){
+  var N={ temp:clamp((t-22)/22), hum:clamp(1-(h-10)/70), wind:clamp(w/40), ndvi:clamp(1-(ndvi-.2)/.6), hist:hist };
+  var c={}, s=0, k;
+  for(k in W){c[k]=W[k]*N[k]; s+=c[k]}
+  var stretch=clamp((s-.26)/.55)*100, scale=s>0?stretch/s:0;
+  for(k in c){c[k]=c[k]*scale}
+  return { score:Math.round(stretch), N:N, contrib:c };
+}
+function scoreZone(z,d){
+  var t=z.base.temp+DAY_TEMP[d], h=clamp(z.base.hum+DAY_HUM[d],12,90), w=z.base.wind+DAY_WIND[d];
+  var r=scoreFrom(t,h,w,z.base.ndvi,z.base.hist);
+  return { score:r.score, temp:t, hum:h, wind:w, ndvi:z.base.ndvi, hist:z.base.hist, contrib:r.contrib };
+}
+var FC={};
+ZONES.forEach(function(z){FC[z.id]=[];for(var d=0;d<7;d++)FC[z.id].push(scoreZone(z,d))});
+
+function nearest(list,x,y){var b=null,bd=1e9;list.forEach(function(p){var d=Math.hypot(p.x-x,p.y-y);if(d<bd){bd=d;b=p}});return b}
+function dayCounts(d){var o={high:0,med:0,low:0};ZONES.forEach(function(z){o[sev(FC[z.id][d].score)]++});return o}
+function buildAlerts(){
+  var out=[];
+  ZONES.forEach(function(z){for(var d=0;d<7;d++){if(FC[z.id][d].score>=THRESH_HIGH){out.push({id:z.id,day:d,score:FC[z.id][d].score});break}}});
+  out.sort(function(a,b){return a.day-b.day||b.score-a.score});
+  return out;
+}
+/* Response planning: rank alerts by arrival day then score, fund them until the pool runs out. */
+function planResponse(alerts){
+  var t=POOL.tankers,c=POOL.crews,items=[];
+  alerts.forEach(function(a){
+    var z=zoneById(a.id),st=nearest(STATIONS,z.cx,z.cy),nt=a.score>=70?3:2,nc=1,ok=t>=nt&&c>=nc;
+    if(ok){t-=nt;c-=nc}
+    items.push({id:a.id,day:a.day,score:a.score,t:nt,c:nc,funded:ok,station:st});
+  });
+  return {items:items,left:{t:t,c:c}};
+}
+/* Illustrative response-time comparison for a fire starting in a zone. */
+function simTimes(zid){
+  var z=zoneById(zid),st=nearest(STATIONS,z.cx,z.cy),km=Math.hypot(st.x-z.cx,st.y-z.cy)*KM_PER_UNIT,A=SIM_ASSUME;
+  var r={detect:A.detect,dispatch:A.dispatch,drive:Math.round(km/A.speed*60),setup:A.setup};
+  var p={detect:A.detect,dispatch:0,drive:A.local,setup:A.setup};
+  r.total=r.detect+r.dispatch+r.drive+r.setup; p.total=p.detect+p.dispatch+p.drive+p.setup;
+  return {km:km,station:st,react:r,prep:p};
+}
+
+/* ----- evidence: sample validation data (synthetic, clearly labelled in the UI) ----- */
+function gauss(r){var u=1-r(),v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function makeSample(){var r=mulberry32(11),L=[],S=[],i,f;for(i=0;i<800;i++){f=r()<.1;L.push(f?1:0);S.push(Math.round(clamp((f?66:42)+gauss(r)*17,0,100)))}return{labels:L,scores:S}}
+var SAMPLE_VALIDATION=makeSample();
+var SAMPLE_BACKTEST=[
+  {name:"Sample fire A",zone:"Zone D5",scores:[30,36,44,56,66,74,81,86],note:"Risk climbed steadily and crossed the threshold three days before ignition."},
+  {name:"Sample fire B",zone:"Zone C6",scores:[28,31,40,52,61,68,75,80],note:"The score crossed the threshold two days before ignition."},
+  {name:"Sample fire C (missed)",zone:"Zone B2",scores:[41,43,45,49,53,58,60,63],note:"The score stayed just under the threshold, so no alert was raised. Misses like this are why we also report recall."}
+];
+function confusion(v,th){var tp=0,fp=0,tn=0,fn=0,i;for(i=0;i<v.labels.length;i++){var pos=v.scores[i]>=th;if(v.labels[i]){if(pos)tp++;else fn++}else{if(pos)fp++;else tn++}}return{tp:tp,fp:fp,tn:tn,fn:fn}}
+function rocPoints(v){var pts=[],t,auc=0,prev=null;for(t=101;t>=0;t--){var c=confusion(v,t),p={x:c.fp/Math.max(1,c.fp+c.tn),y:c.tp/Math.max(1,c.tp+c.fn)};if(prev)auc+=(p.x-prev.x)*(p.y+prev.y)/2;pts.push(p);prev=p}return{pts:pts,auc:auc}}
+function prPoints(v){var pts=[],t,auc=0,prev=null,posTotal=0;for(var i=0;i<v.labels.length;i++){if(v.labels[i])posTotal++}var base=posTotal/Math.max(1,v.labels.length);for(t=101;t>=0;t--){var c=confusion(v,t),rec=c.tp/Math.max(1,c.tp+c.fn),prec=(c.tp+c.fp)>0?(c.tp/(c.tp+c.fp)):1,p={x:rec,y:prec};if(prev&&p.x>prev.x)auc+=(p.x-prev.x)*((p.y+prev.y)/2);pts.push(p);prev=p}return{pts:pts,auc:auc,baseline:base}}
+</script>
+
+<!-- ============ APP ============ -->
+<script id="app">
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var NS="http://www.w3.org/2000/svg";
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function dateFor(d){var t=new Date();t.setDate(t.getDate()+d+1);return t}
+function dayLabel(d){return dateFor(d).toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}
+
+/* ---------- reusable map ---------- */
+function rngPath(rnd,cx,cy,r,n){
+  var p=[],i;for(i=0;i<n;i++){var a=i/n*Math.PI*2,rr=r*(1+(rnd()-.5)*.28+.1*Math.sin(a*3));p.push([cx+Math.cos(a)*rr*1.35,cy+Math.sin(a)*rr])}
+  return "M"+p.map(function(q){return q[0].toFixed(0)+" "+q[1].toFixed(0)}).join("L")+"Z";
+}
+function zoneStyle(z,v){
+  if(!v.ran) return {fill:"var(--ink)",fo:.03,stroke:"var(--ink)",so:.45};
+  var f=FC[z.id][v.day],h;
+  if(v.mode==="ndvi"){h=40+clamp((f.ndvi-.3)/.5)*100;return{fill:"hsl("+h+" 65% 55%)",fo:.5,stroke:"hsl("+h+" 65% 50%)",so:1}}
+  if(v.mode==="hum"){h=20+clamp((f.hum-12)/70)*180;return{fill:"hsl("+h+" 72% 58%)",fo:.5,stroke:"hsl("+h+" 72% 52%)",so:1}}
+  var s=sev(f.score),col=s==="high"?"var(--high)":s==="med"?"var(--med)":"var(--low)";
+  return{fill:col,fo:.08+.32*Math.pow(f.score/100,1.5),stroke:col,so:.95};
+}
+function createMap(svg,opt){
+  var rnd=mulberry32(77),i,m,h="",P=opt.prefix||"m";
+  var FOREST=["#1E3A27","#254430","#2C4F36","#193023"],FIELD=["#6F7A4A","#80804F","#5F7044","#8C8A5C","#76704A"],TREE=["#14281B","#2F5A3A","#3C6B45","#10231A"];
+  h+='<defs><filter id="heat'+P+'" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="16"/></filter>'+
+     '<radialGradient id="fire'+P+'"><stop offset="0" stop-color="#E9B44C" stop-opacity=".95"/><stop offset=".45" stop-color="#FF765E" stop-opacity=".7"/><stop offset="1" stop-color="#FF765E" stop-opacity="0"/></radialGradient></defs>';
+  h+='<rect x="-200" y="-200" width="1300" height="1000" fill="var(--land)"/>';
+  for(m=0;m<7;m++)h+='<path d="'+rngPath(rnd,60+rnd()*780,60+rnd()*480,60+rnd()*70,36)+'" fill="#66744A" opacity=".5"/>';
+  var fm=[];
+  for(m=0;m<16;m++){var fx=40+rnd()*820,fy=30+rnd()*540,fr=52+rnd()*70;fm.push([fx,fy,fr]);h+='<path d="'+rngPath(rnd,fx,fy,fr,40)+'" fill="'+FOREST[m%4]+'" opacity=".92"/>'}
+  h+='<g class="g-fields">';
+  VILLAGES.forEach(function(v){for(var k=0;k<9;k++){var qx=v.x+(rnd()-.5)*120,qy=v.y+(rnd()-.5)*90,fw=18+rnd()*34,fh=12+rnd()*24,ang=(rnd()-.5)*30;h+='<rect x="'+(qx-fw/2).toFixed(0)+'" y="'+(qy-fh/2).toFixed(0)+'" width="'+fw.toFixed(0)+'" height="'+fh.toFixed(0)+'" rx="1.5" transform="rotate('+ang.toFixed(0)+' '+qx.toFixed(0)+' '+qy.toFixed(0)+')" fill="'+FIELD[k%5]+'" opacity=".88"/>'}});
+  h+='</g><g class="g-canopy">';
+  fm.forEach(function(f){for(var k=0;k<46;k++){var an=rnd()*6.283,dd=Math.sqrt(rnd())*f[2]*.9;h+='<circle cx="'+(f[0]+Math.cos(an)*dd*1.3).toFixed(0)+'" cy="'+(f[1]+Math.sin(an)*dd*.85).toFixed(0)+'" r="'+(1.6+rnd()*2.6).toFixed(1)+'" fill="'+TREE[k%4]+'" opacity="'+(.45+rnd()*.4).toFixed(2)+'"/>'}});
+  h+='</g><g class="g-terrain">';
+  for(m=0;m<5;m++)h+='<path d="'+rngPath(rnd,120+rnd()*660,80+rnd()*440,26+rnd()*30,28)+'" fill="#7A7462" opacity=".28"/>';
+  [[260,200],[650,390]].forEach(function(pk){for(i=1;i<=7;i++)h+='<path d="'+rngPath(rnd,pk[0],pk[1],i*34,40)+'" fill="none" stroke="var(--contour)" stroke-width="1.2"/>'});
+  h+='</g>';
+  h+='<path d="M-20 335C140 300 230 430 380 385S610 250 920 305" fill="none" stroke="#1D3B4D" stroke-width="13" stroke-linecap="round"/><path d="M-20 335C140 300 230 430 380 385S610 250 920 305" fill="none" stroke="#3F7C94" stroke-width="5" stroke-linecap="round" opacity=".7"/>';
+  h+='<path d="'+rngPath(rnd,115,520,26,24)+'" fill="#244A5E" stroke="#3F7C94" stroke-width="1.5"/>';
+  h+='<g class="g-heat" filter="url(#heat'+P+')">'+ZONES.map(function(z){return '<polygon data-id="'+z.id+'" points="'+z.poly+'" style="fill-opacity:0"/>'}).join("")+'</g>';
+  h+='<g class="g-zones">'+ZONES.map(function(z){return '<polygon class="zone" data-id="'+z.id+'" points="'+z.poly+'" tabindex="'+(opt.interactive?0:-1)+'" role="button" aria-label="Zone '+z.id+'"/>'}).join("")+'</g>';
+  var RD=["M-10 95C200 150 400 60 910 165","M130 610C250 430 340 300 430 -10","M0 520C250 540 500 470 910 560"];
+  h+='<g class="g-roads" style="pointer-events:none">'+RD.map(function(d,k){return '<path d="'+d+'" fill="none" stroke="#0E1418" stroke-opacity=".55" stroke-width="5.2" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="var(--road)" stroke-width="2.6" stroke-linecap="round"'+(k===2?' stroke-dasharray="9 5"':'')+'/>'}).join("")+'</g>';
+  h+='<g class="g-pulse"></g>';
+  h+='<g class="g-labels">'+ZONES.map(function(z){return '<text class="zlabel" data-id="'+z.id+'" x="'+z.cx.toFixed(0)+'" y="'+z.cy.toFixed(0)+'">'+z.id+'</text>'}).join("")+'</g>';
+  h+='<g class="g-places">'+VILLAGES.map(function(p){return '<circle cx="'+p.x+'" cy="'+p.y+'" r="3.6" fill="#EAF0F5" stroke="#0B1218" stroke-width="1.5"/><text class="place" x="'+(p.x+8)+'" y="'+(p.y+4)+'">'+p.n+'</text>'}).join("")+STATIONS.map(function(p){return '<rect x="'+(p.x-6)+'" y="'+(p.y-6)+'" width="12" height="12" rx="2" fill="var(--ember)" stroke="#fff" stroke-width="1.5"/><text class="place" x="'+(p.x+10)+'" y="'+(p.y+4)+'" style="font-weight:700">'+p.n.split(",")[0]+'</text>'}).join("")+'</g>';
+  h+='<g class="g-units"></g><g class="g-sel"></g>';
+  svg.innerHTML=h;
+  var zEls={},lEls={},hEls={},gPulse=$(".g-pulse",svg),gSel=$(".g-sel",svg);
+  $$(".g-zones .zone",svg).forEach(function(e){zEls[e.getAttribute("data-id")]=e});
+  $$(".zlabel",svg).forEach(function(e){lEls[e.getAttribute("data-id")]=e});
+  $$(".g-heat polygon",svg).forEach(function(e){hEls[e.getAttribute("data-id")]=e});
+  var pulses={};
+  ZONES.forEach(function(z){var c=document.createElementNS(NS,"circle");c.setAttribute("cx",z.cx);c.setAttribute("cy",z.cy);c.setAttribute("r",26);c.setAttribute("class","pulse");c.style.display="none";gPulse.appendChild(c);pulses[z.id]=c});
+  var api={zEls:zEls,prefix:P};
+  api.update=function(v){
+    ZONES.forEach(function(z){
+      var s=zoneStyle(z,v),e=zEls[z.id],f=FC[z.id][v.day],hp=hEls[z.id];
+      e.style.fill=s.fill;e.style.fillOpacity=s.fo;e.style.stroke=s.stroke;e.style.strokeOpacity=s.so;
+      if(v.ran&&v.mode==="risk"&&f.score>=THRESH_MED){hp.style.fill=sev(f.score)==="high"?"var(--high)":"var(--med)";hp.style.fillOpacity=(((f.score-35)/70)*.55).toFixed(2)}
+      else hp.style.fillOpacity=0;
+      var l=lEls[z.id];
+      if(opt.labels===false){l.style.display="none"}
+      else if(v.ran){l.innerHTML=z.id+'<tspan x="'+z.cx.toFixed(0)+'" dy="14" style="font-weight:500;font-size:11px">'+(v.mode==="risk"?f.score:v.mode==="ndvi"?f.ndvi.toFixed(2):Math.round(f.hum)+"%")+'</tspan>'}
+      else l.textContent=z.id;
+      pulses[z.id].style.display=(v.ran&&v.mode==="risk"&&f.score>=THRESH_HIGH)?"":"none";
+    });
+    $(".g-places",svg).style.display=v.places===false?"none":"";
+    $(".g-roads",svg).style.display=v.places===false?"none":"";
+    $(".g-terrain",svg).style.display=v.terrain===false?"none":"";
+    gSel.innerHTML="";
+    if(v.selected){var z=zoneById(v.selected);var p=document.createElementNS(NS,"polygon");p.setAttribute("points",z.poly);p.setAttribute("class","sel");gSel.appendChild(p)}
+  };
+  api.sweep=function(){ZONES.forEach(function(z){zEls[z.id].style.transitionDelay=(z.cx/MW*900).toFixed(0)+"ms"});setTimeout(function(){ZONES.forEach(function(z){zEls[z.id].style.transitionDelay="0ms"})},1900)};
+  return api;
+}
+
+/* ---------- landing: hero preview, ticker, embers, counters, metrics ---------- */
+var hero=createMap($("#heroMap"),{interactive:false,labels:false,prefix:"h"});
+var hd=0,dots=$("#heroDots");
+for(var di=0;di<7;di++){var dd=document.createElement("i");dots.appendChild(dd)}
+function heroTick(){
+  hero.update({ran:true,mode:"risk",day:hd,selected:null});
+  $("#heroDay").textContent="Day "+(hd+1)+" · "+dateFor(hd).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+  $$("i",dots).forEach(function(e,i){e.className=i===hd?"on":""});
+  hd=(hd+1)%7;
+}
+heroTick();
+if(!reduce) setInterval(heroTick,1700);
+
+(function ticker(){
+  var al=buildAlerts(),pl=planResponse(al).items;
+  var items=pl.map(function(a){return '<span><b>Zone '+a.id+'</b> · Day '+(a.day+1)+' · High risk '+a.score+' · '+(a.funded?'Stage '+a.t+' tankers at '+a.station.n:'Request mutual aid')+'</span>'}).join("");
+  $("#track").innerHTML=items+items;
+})();
+
+(function embers(){
+  var cv=$("#embers"),ctx=cv.getContext("2d"),P=[],W0,H0;
+  function size(){var r=cv.getBoundingClientRect();W0=cv.width=r.width;H0=cv.height=r.height}
+  size();window.addEventListener("resize",size);
+  var PAL=["255,250,236"];
+  for(var i=0;i<28;i++)P.push({x:Math.random(),y:Math.random(),r:Math.random()*1.6+.7,s:Math.random()*.00025+.00008,o:Math.random()*.3+.2,c:0});
+  function draw(){
+    ctx.clearRect(0,0,W0,H0);
+    P.forEach(function(p){p.y-=p.s;p.x+=Math.sin(p.y*20)*.0004;if(p.y<-.02){p.y=1.02;p.x=Math.random()}
+      ctx.beginPath();ctx.fillStyle="rgba("+PAL[p.c]+","+(p.o*(1-p.y*.5))+")";ctx.arc(p.x*W0,p.y*H0,p.r,0,7);ctx.fill()});
+    if(!reduce)requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+
+/* ---------- calm forest scenery ---------- */
+function pine(x,y,h){var w=h*.56,f=function(n){return n.toFixed(1)};
+  return "M"+f(x)+" "+f(y-h)+"L"+f(x+.26*w)+" "+f(y-.66*h)+"L"+f(x+.16*w)+" "+f(y-.66*h)+"L"+f(x+.38*w)+" "+f(y-.36*h)+"L"+f(x+.24*w)+" "+f(y-.36*h)+"L"+f(x+.5*w)+" "+f(y-.06*h)+"L"+f(x+.06*w)+" "+f(y-.06*h)+"L"+f(x+.06*w)+" "+f(y)+"L"+f(x-.06*w)+" "+f(y)+"L"+f(x-.06*w)+" "+f(y-.06*h)+"L"+f(x-.5*w)+" "+f(y-.06*h)+"L"+f(x-.24*w)+" "+f(y-.36*h)+"L"+f(x-.38*w)+" "+f(y-.36*h)+"L"+f(x-.16*w)+" "+f(y-.66*h)+"L"+f(x-.26*w)+" "+f(y-.66*h)+"Z"}
+function roundTree(x,y,h){var rx=h*.26,ry=h*.32,cy=y-h*.6,f=function(n){return n.toFixed(1)};
+  return "M"+f(x-3)+" "+f(y)+"L"+f(x-3)+" "+f(y-h*.3)+"L"+f(x+3)+" "+f(y-h*.3)+"L"+f(x+3)+" "+f(y)+"ZM"+f(x-rx)+" "+f(cy)+"A"+f(rx)+" "+f(ry)+" 0 1 0 "+f(x+rx)+" "+f(cy)+"A"+f(rx)+" "+f(ry)+" 0 1 0 "+f(x-rx)+" "+f(cy)+"Z"}
+(function forest(){
+  var svg=$("#forest");if(!svg)return;
+  var rnd=mulberry32(42),VW=1440,h='<defs><linearGradient id="mistG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--mist);stop-opacity:0"/><stop offset=".55" style="stop-color:var(--mist);stop-opacity:.34"/><stop offset="1" style="stop-color:var(--mist);stop-opacity:0"/></linearGradient></defs>';
+  var L=[{c:"--tree1",y:240,n:52,a:70,b:120,cls:"l1"},{c:"--tree2",y:262,n:36,a:100,b:170,cls:"l2"},{c:"--tree3",y:286,n:24,a:140,b:210,cls:"l3"},{c:"--tree4",y:312,n:9,a:190,b:250,cls:"l4",edge:true}];
+  L.forEach(function(l,li){
+    var d="",i,x,hh;
+    for(i=0;i<l.n;i++){
+      x=l.edge?(rnd()<.5?rnd()*.2:.8+rnd()*.2)*VW:(i+rnd()*.8)/l.n*VW;
+      hh=l.a+rnd()*(l.b-l.a);
+      d+=(!l.edge&&rnd()<.16)?roundTree(x,l.y,hh):pine(x,l.y,hh);
+    }
+    h+='<path class="fl '+l.cls+'" style="fill:var('+l.c+')" d="'+d+'"/>';
+    if(li<3)h+='<rect x="0" y="'+(150+li*30)+'" width="1440" height="120" fill="url(#mistG)"/>';
+  });
+  h+='<rect x="0" y="292" width="1440" height="60" style="fill:var(--bg)"/>';
+  svg.innerHTML=h;
+})();
+(function treelines(){
+  var rnd=mulberry32(9);
+  $$("#home section.t-sky,#home section.t-peach,#home section.t-pink,#home footer").forEach(function(sec){
+    var d="",i,n=64;
+    for(i=0;i<n;i++)d+=(rnd()<.14?roundTree:pine)((i+rnd()*.8)/n*1440,90,28+rnd()*52);
+    sec.insertAdjacentHTML("afterbegin",'<svg class="tl" viewBox="0 0 1440 90" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path d="'+d+'"/></svg>');
+  });
+})();
+
+(function reveal(){
+  if(reduce||!("IntersectionObserver" in window))return;
+  var sel=[".s h2",".s .intro",".rules>div",".rows>div",".xp",".note",".evtabs",".evbanner","#evBody",".legend-row","footer .wrap"];
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(!x.isIntersecting)return;var el=x.target;io.unobserve(el);el.classList.add("in");setTimeout(function(){el.style.transitionDelay=""},1300)})},{threshold:.12});
+  sel.forEach(function(q){$$("#home "+q).forEach(function(el,i){el.classList.add("rv");el.style.transitionDelay=Math.min(i,4)*90+"ms";io.observe(el)})});
+})();
+
+(function counters(){
+  var els=$$("[data-count]");
+  function fmt(e,v){var d=+e.getAttribute("data-dec")||0;e.textContent=(e.getAttribute("data-pre")||"")+v.toFixed(d)+(e.getAttribute("data-suf")||"")}
+  els.forEach(function(e){fmt(e,+e.getAttribute("data-count"))});
+  if(reduce||!("IntersectionObserver" in window))return;
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(!x.isIntersecting)return;io.unobserve(x.target);
+    var e=x.target,end=+e.getAttribute("data-count"),t0=performance.now();
+    (function step(t){var k=Math.min(1,(t-t0)/1400);fmt(e,end*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step)})(t0)})},{threshold:.6});
+  els.forEach(function(e){fmt(e,0);io.observe(e)});
+})();
+
+
+
+
+/* ---------- how it works: interactive explorer ---------- */
+var DRV={temp:"Temperature",hum:"Dry air",wind:"Wind speed",ndvi:"Dry vegetation",hist:"Fire history"};
+var XS=[
+ {n:"Ingest",s:"Gather three signals",i:'<path d="M12 3v12m0 0-4-4m4 4 4-4M4 20h16"/>'},
+ {n:"Process",s:"Clean and align to the grid",i:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'},
+ {n:"Predict",s:"Turn conditions into a score",i:'<path d="m3 17 5-6 4 3 6-8"/><circle cx="18" cy="6" r="1.5"/>'},
+ {n:"Visualize",s:"Paint the score on the map",i:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>'},
+ {n:"Alert",s:"Warn above a threshold",i:'<path d="M6 9a6 6 0 1 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 19a2 2 0 0 0 4 0"/>'},
+ {n:"Respond",s:"Stage trucks, warn villages",i:'<path d="M3 15V8h11v7M14 11h4l3 3v1h-3M3 15h2m11 0h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>'}
+];
+var PRESETS={cool:{temp:24,hum:70,wind:8,ndvi:.72,hist:.2},typical:{temp:34,hum:31,wind:11,ndvi:.46,hist:.6},heat:{temp:41,hum:16,wind:22,ndvi:.34,hist:.85}};
+var TILE_OFF=[-26,-12,-4,-16,-34,-9,6,0,-3,-20,-18,-5,9,-12,-28];
+var X={i:0,seen:{0:true},pg:{temp:34,hum:31,wind:11,ndvi:.46,hist:.6},preset:"typical",th:65,cleaned:false,src:{w:true,n:true,f:true},age:3,tour:null};
+function sevT(s,th){return s>=th?"high":s>=THRESH_MED?"med":"low"}
+function svgI(p){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>'}
+function xHead(t,l){return '<h3>'+t+'</h3><p class="lede">'+l+'</p>'}
+function xFoot(){return '<div class="xnav"><button class="act sec" type="button" data-x="prev"'+(X.i===0?" disabled":"")+'>Back</button><span class="dim" style="font-size:13px">Step '+(X.i+1)+' of 6</span><button class="act" type="button" data-x="next"'+(X.i===5?" disabled":"")+'>Next step</button></div>'}
+function pgScore(){var p=X.pg;return scoreFrom(p.temp,p.hum,p.wind,p.ndvi,p.hist)}
+function tiles(){var base=pgScore().score;return TILE_OFF.map(function(o,i){return{id:String.fromCharCode(65+Math.floor(i/5))+(i%5+1),score:Math.round(clamp(base+o,0,100)),center:i===7}})}
+function tileGrid(th){return '<div class="tgrid">'+tiles().map(function(t){return '<div class="tile '+sevT(t.score,th)+(t.center?" ctr":"")+'">'+t.score+'<small>'+t.id+'</small></div>'}).join("")+'</div>'}
+function srcCard(k,title,pc,pt,meta,desc){return '<label class="src" id="src-'+k+'"><input type="checkbox" data-k="src-'+k+'" checked><span><b>'+title+'</b><span class="pill '+pc+'">'+pt+'</span><small id="meta-'+k+'">'+meta+'</small><small>'+desc+'</small></span></label>'}
+function slr(label,key,min,max,step){return '<div class="sl"><span>'+label+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+X.pg[key]+'" data-k="pg-'+key+'" aria-label="'+label+'"><b id="pgv-'+key+'"></b></div>'}
+
+function xStageHTML(i){
+  if(i===0)return xHead("Ingest","Three independent signals feed one model. Switch a signal off to see what the model would lose.")+
+    '<div class="srcs">'+srcCard("w","Weather forecast","fc","Forecast","Open-Meteo, demo snapshot","Temperature, humidity and wind for the next 7 days")+srcCard("n","Vegetation dryness (NDVI)","obs","Observed","","How dry and flammable the plants are, from Sentinel-2 imagery")+srcCard("f","Fire history","obs","Observed","NASA FIRMS, demo snapshot","Recurring hotspots and seasonal patterns")+'</div>'+
+    '<div class="sl"><span>NDVI age</span><input type="range" min="0" max="10" step="1" value="'+X.age+'" data-k="age" aria-label="Days since last clear Sentinel-2 pass"><b id="ageV"></b></div>'+
+    '<div class="mlab"><span>Data completeness</span><span id="cmpV"></span></div><div class="meter"><i id="cmpB"></i></div><div class="expl" id="ingMsg" style="margin-top:12px"></div>'+xFoot();
+  if(i===1){
+    var r=scoreFrom(34,31,11,.46,.6).N,c=X.cleaned;
+    var rows=[["Temperature","93.2 °F","Fahrenheit, not Celsius","34.0 °C",r.temp],["Humidity","0.31","A fraction, not a percent","31 %",r.hum],["Wind","3.1 m/s","A different unit","11 km/h",r.wind],["NDVI","missing","Cloud over the pixel","0.46 (last clear pass)",r.ndvi],["Fire history","3 fires in 5 seasons","A count, not a score","0.60",r.hist]];
+    return xHead("Process","Raw feeds arrive in different units, with gaps. This step cleans them and aligns everything to one grid zone, so the model sees five comparable numbers.")+
+      '<table class="ptab"><thead><tr><th>Signal</th><th>As received</th><th>Problem</th><th>After cleaning</th><th>Model feature</th></tr></thead><tbody>'+
+      rows.map(function(x){return '<tr><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td class="'+(c?"dim":"bad")+'">'+(c?"Fixed":x[2])+'</td><td class="'+(c?"goodc":"dim")+'">'+(c?x[3]:"waiting")+'</td><td>'+(c?'<span class="nb"><i style="width:'+x[4]*100+'%"></i></span>'+x[4].toFixed(2):'<span class="dim">waiting</span>')+'</td></tr>'}).join("")+'</tbody></table>'+
+      '<div class="cta-row"><button class="act" type="button" data-x="clean">'+(c?"Undo":"Clean and align")+'</button><span class="dim" style="font-size:14px">'+(c?"All five features are aligned to Zone C4 and scaled from 0 to 1.":"Press the button to clean the data.")+'</span></div>'+xFoot();
+  }
+  if(i===2)return xHead("Predict","Move the sliders to see how the model turns conditions into a 0 to 100 risk score. This is the same scoring logic as the dashboard demo.")+
+    '<div class="pre"><button class="chipbtn" type="button" data-x="preset" data-p="cool">Cool, wet day</button><button class="chipbtn" type="button" data-x="preset" data-p="typical">Typical dry day</button><button class="chipbtn" type="button" data-x="preset" data-p="heat">Heatwave</button></div>'+
+    slr("Temperature","temp",20,45,1)+slr("Humidity","hum",10,90,1)+slr("Wind speed","wind",0,40,1)+slr("NDVI (greenness)","ndvi",.2,.8,.01)+slr("Fire history","hist",0,1,.05)+'<div id="pgOut"></div>'+xFoot();
+  if(i===3)return xHead("Visualize","The score becomes a color. Each tile is a forest zone. The ringed tile uses the score from Predict. Its neighbours have slightly different conditions.")+tileGrid(THRESH_HIGH)+
+    '<div class="legend-row" style="margin-top:0"><span><i class="sw" style="background:var(--low)"></i>Low, under 40</span><span><i class="sw" style="background:var(--med)"></i>Medium, 40 to 64</span><span><i class="sw" style="background:var(--high)"></i>High, 65 and up</span></div><p class="fine" style="margin-top:12px">Go back to Predict and change the sliders to repaint these tiles.</p>'+xFoot();
+  if(i===4)return xHead("Alert","Choose how high a score must be before the station is alerted. Lower means earlier warning but more false alarms. Higher means fewer false alarms but a later warning.")+
+    '<div class="sl"><span>Alert threshold</span><input type="range" min="50" max="85" step="1" value="'+X.th+'" data-k="th" aria-label="Alert threshold"><b id="thV"></b></div><div id="alOut"></div>'+xFoot();
+  return xHead("Respond","A warning only matters if someone acts on it. IGNIS AI turns each alert into a plan the station can use.")+
+    '<div class="acts"><div><b>Plan</b>Rank alerts and assign tankers and crews from a limited pool.</div><div><b>Stage</b>Move trucks to the zone before it peaks.</div><div><b>Warn</b>Send villages a plain-language advisory.</div></div>'+
+    '<p class="lede">Then test the plan: start a simulated fire and compare how long water takes to reach it with and without staged units.</p><div class="cta-row"><a class="btn primary" href="#intelligence">Open the live dashboard</a></div>'+xFoot();
+}
+function xIngestUpdate(){
+  var s=X.src,n=(s.w?1:0)+(s.n?1:0)+(s.f?1:0),m=[];
+  ["w","n","f"].forEach(function(k){var el=$("#src-"+k);if(el)el.classList.toggle("off",!s[k])});
+  $("#ageV").textContent=X.age+" day"+(X.age===1?"":"s");
+  $("#meta-n").textContent="Sentinel-2, last clear pass "+X.age+" day"+(X.age===1?"":"s")+" ago";
+  $("#cmpV").textContent=Math.round(n/3*100)+"%";$("#cmpB").style.width=(n/3*100)+"%";
+  if(!s.w)m.push("Without weather, the model loses its fastest-changing signal: temperature, humidity and wind.");
+  if(!s.n)m.push("Without NDVI, the model cannot see how dry the vegetation is.");
+  if(!s.f)m.push("Without fire history, the model loses recurring hotspots.");
+  if(s.n){if(X.age>5)m.push("This NDVI is older than Sentinel-2’s revisit time of about 5 days. Treat vegetation dryness with caution.");else if(X.age>=3)m.push("NDVI that is 3 to 5 days old is normal for Sentinel-2, so the model still uses it.");else m.push("The vegetation reading is fresh.")}
+  if(n===3&&X.age<=5)m.unshift("All three signals are present, so every zone can be scored.");
+  $("#ingMsg").textContent=m.join(" ");
+}
+function xPredictUpdate(setSliders){
+  var p=X.pg,keys=["temp","hum","wind","ndvi","hist"],units={temp:" °C",hum:"%",wind:" km/h"};
+  keys.forEach(function(k){
+    var inp=$('[data-k="pg-'+k+'"]');if(setSliders&&inp)inp.value=p[k];
+    $("#pgv-"+k).textContent=k==="ndvi"?p[k].toFixed(2):k==="hist"?Math.round(p[k]*100)+"%":p[k]+units[k];
+  });
+  $$('[data-x="preset"]').forEach(function(b){var q=PRESETS[b.getAttribute("data-p")],same=keys.every(function(k){return Math.abs(q[k]-p[k])<1e-9});b.setAttribute("aria-pressed",same)});
+  var r=pgScore(),sv=sev(r.score),tot=0,k2;for(k2 in r.contrib)tot+=r.contrib[k2];
+  var top=Object.keys(r.contrib).map(function(k){return[k,r.contrib[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,3);
+  $("#pgOut").innerHTML='<div style="display:flex;align-items:flex-end;gap:14px;margin-top:14px"><div class="bigscore" style="text-align:left">'+r.score+'</div><span class="sev '+sv+'">'+sevName(r.score)+'</span><span class="dim" style="font-size:13px;margin-left:auto">'+(sv==="high"?"This would raise a station alert.":"No alert at this score.")+'</span></div><div class="gauge"><i style="left:'+r.score+'%"></i></div><div class="mlab"><span>Low, under 40</span><span>Medium, 40 to 64</span><span>High, 65 and up</span></div>'+
+    '<div style="margin-top:12px;font-size:14px;font-weight:700">Top drivers</div>'+top.map(function(t){var pc=tot?t[1]/tot*100:0;return '<div class="drv"><span>'+DRV[t[0]]+'</span><div class="bar"><i style="width:'+pc+'%"></i></div><span>'+pc.toFixed(0)+'%</span></div>'}).join("");
+}
+function xAlertUpdate(){
+  $("#thV").textContent=X.th;
+  var fl=tiles().filter(function(t){return t.score>=X.th}).sort(function(a,b){return b.score-a.score});
+  $("#alOut").innerHTML=tileGrid(X.th)+(fl.length?fl.map(function(t){return '<div class="pl"><b>Zone '+t.id+'</b><span>Score '+t.score+'<small>Stage '+(t.score>=70?3:2)+' tankers and 1 crew at the nearest station</small></span><span class="no">Alert</span></div>'}).join(""):'<div class="expl">No alert. Every zone is below the threshold of '+X.th+'.</div>')+'<p class="fine">Flagged: '+fl.length+' of 15 zones. Scores come from the Predict step.</p>';
+}
+function xRender(){
+  $("#xsteps").innerHTML=XS.map(function(s,i){return '<button type="button" role="tab" class="xstep'+(X.seen[i]?" seen":"")+'" aria-selected="'+(i===X.i)+'" data-step="'+i+'"><span class="ic">'+svgI(s.i)+'</span><span><b>'+s.n+'</b><small>'+s.s+'</small></span></button>'}).join("");
+  var st=$("#xstage");st.innerHTML=xStageHTML(X.i);st.classList.remove("in");void st.offsetWidth;st.classList.add("in");
+  if(X.i===0)xIngestUpdate();if(X.i===2)xPredictUpdate(true);if(X.i===4)xAlertUpdate();
+  $("#xtour").textContent=X.tour?"❚❚ Pause the tour":"▶ Play the tour";
+}
+function xGo(i,manual){if(manual)stopTour();X.i=Math.max(0,Math.min(5,i));X.seen[X.i]=true;xRender()}
+function stopTour(){if(X.tour){clearInterval(X.tour);X.tour=null}}
+function toggleTour(){
+  if(X.tour){stopTour();$("#xtour").textContent="▶ Play the tour";return}
+  if(X.i>=5)xGo(0,false);
+  X.tour=setInterval(function(){if(X.i>=5){stopTour();xRender();return}xGo(X.i+1,false)},4500);
+  $("#xtour").textContent="❚❚ Pause the tour";
+}
+$("#xp").addEventListener("click",function(e){
+  var st=e.target.closest("[data-step]");if(st){xGo(+st.getAttribute("data-step"),true);return}
+  var a=e.target.closest("[data-x]");if(!a)return;var k=a.getAttribute("data-x");
+  if(k==="next")xGo(X.i+1,true);else if(k==="prev")xGo(X.i-1,true);
+  else if(k==="clean"){X.cleaned=!X.cleaned;xRender()}
+  else if(k==="preset"){var q=PRESETS[a.getAttribute("data-p")];X.pg={temp:q.temp,hum:q.hum,wind:q.wind,ndvi:q.ndvi,hist:q.hist};xPredictUpdate(true)}
+  else if(k==="tour")toggleTour();
+});
+$("#xtour").addEventListener("click",toggleTour);
+$("#xp").addEventListener("input",function(e){
+  var k=e.target.getAttribute("data-k");if(!k)return;
+  if(k.indexOf("pg-")===0){X.pg[k.slice(3)]=+e.target.value;xPredictUpdate(false)}
+  else if(k==="th"){X.th=+e.target.value;xAlertUpdate()}
+  else if(k==="age"){X.age=+e.target.value;xIngestUpdate()}
+  else if(k.indexOf("src-")===0){X.src[k.slice(4)]=e.target.checked;xIngestUpdate()}
+});
+xRender();
+
+/* ---------- evidence ---------- */
+var EV={tab:"perf",curve:"roc",th:65,bt:0,idx:7,playing:null};
+function evData(){return VALIDATION||SAMPLE_VALIDATION}
+function evReal(){return !!VALIDATION}
+function evBT(){return BACKTEST||SAMPLE_BACKTEST}
+function stopEvPlay(){if(EV.playing){clearInterval(EV.playing);EV.playing=null}}
+var ROC_CACHE=null,PR_CACHE=null;
+function rocFor(v){if(!ROC_CACHE||ROC_CACHE.v!==v)ROC_CACHE={v:v,r:rocPoints(v)};return ROC_CACHE.r}
+function prFor(v){if(!PR_CACHE||PR_CACHE.v!==v)PR_CACHE={v:v,r:prPoints(v)};return PR_CACHE.r}
+function impactStats(){
+  var al=buildAlerts(),pl=planResponse(al),fu=pl.items.filter(function(i){return i.funded});
+  var rows=fu.map(function(i){var t=simTimes(i.id);return{id:i.id,day:i.day+1,t:i.t,r:t.react.total,p:t.prep.total,g:t.react.total-t.prep.total}});
+  var g=rows.reduce(function(a,r){return a+r.g},0)/Math.max(1,rows.length);
+  var days=al.map(function(a){return a.day+1});
+  return{n:al.length,funded:fu.length,rows:rows,gain:Math.round(g),minD:Math.min.apply(null,days),maxD:Math.max.apply(null,days),pl:pl};
+}
+function evRender(){
+  $$("#evTabs button").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-evtab")===EV.tab)});
+  var ban=$("#evBanner"),body=$("#evBody");ban.hidden=false;
+  if(EV.tab==="perf"||EV.tab==="back")ban.innerHTML=evReal()?'<span class="pill obs">Measured</span><span>Computed on held-out data: '+evData().labels.length+' zone-days.</span>':'<span class="pill ill">Illustrative sample</span><span>These charts use synthetic sample data to show how results will be reported. They are not results from our trained model.</span>';
+  else if(EV.tab==="impact")ban.innerHTML='<span class="pill ill">Simulation</span><span>Computed from the demo forecast and response simulation, using the assumptions listed under the table.</span>';
+  else ban.hidden=true;
+  if(EV.tab==="perf"){
+    var isPr=EV.curve==="pr",cur=isPr?prFor(evData()):rocFor(evData());
+    var pts=cur.pts.map(function(p){return(44+p.x*252).toFixed(1)+","+(256-p.y*240).toFixed(1)}).join(" ");
+    var grid="";[0,.25,.5,.75,1].forEach(function(g){grid+='<line x1="44" x2="296" y1="'+(256-g*240)+'" y2="'+(256-g*240)+'" stroke="var(--line)"/><line y1="16" y2="256" x1="'+(44+g*252)+'" x2="'+(44+g*252)+'" stroke="var(--line)"/><text x="38" y="'+(260-g*240)+'" text-anchor="end">'+g+'</text><text y="272" x="'+(44+g*252)+'" text-anchor="middle">'+g+'</text>'});
+    var refLine=isPr
+      ?'<line x1="44" y1="'+(256-cur.baseline*240).toFixed(1)+'" x2="296" y2="'+(256-cur.baseline*240).toFixed(1)+'" stroke="var(--muted)" stroke-dasharray="5 5"/><text x="290" y="'+(250-cur.baseline*240).toFixed(1)+'" text-anchor="end" style="fill:var(--muted);font-size:10px">Prevalence ('+Math.round(cur.baseline*100)+'%)</text>'
+      :'<line x1="44" y1="256" x2="296" y2="16" stroke="var(--muted)" stroke-dasharray="5 5"/>';
+    var xLab=isPr?"Recall (Fires caught)":"False alarm rate";
+    var yLab=isPr?"Precision (Fires / Alerts)":"Fires caught";
+    var note=isPr?'PR-AUC (Average Precision). Evaluates performance under imbalanced fire occurrence.':'ROC-AUC. 0.5 is a coin flip, 1.0 is perfect discrimination.';
+    body.innerHTML='<div class="evgrid"><div class="evcard">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+        '<h4>'+(isPr?'Precision-Recall curve':'ROC curve')+'</h4>'+
+        '<div style="display:inline-flex;background:var(--surface2);padding:2px;border-radius:8px;border:1px solid var(--line);gap:2px">'+
+          '<button type="button" class="chipbtn" data-evcurve="roc" aria-pressed="'+(!isPr)+'" style="padding:3px 9px;font-size:11px;border:none;border-radius:6px;cursor:pointer;'+(!isPr?'background:var(--accent);color:var(--on-accent);font-weight:700':'color:var(--muted)')+'">ROC</button>'+
+          '<button type="button" class="chipbtn" data-evcurve="pr" aria-pressed="'+isPr+'" style="padding:3px 9px;font-size:11px;border:none;border-radius:6px;cursor:pointer;'+(isPr?'background:var(--accent);color:var(--on-accent);font-weight:700':'color:var(--muted)')+'">PR Curve</button>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:6px"><div class="auc">'+cur.auc.toFixed(2)+'</div><span class="dim" style="font-size:13px;padding-bottom:6px">'+note+'</span></div>'+
+      '<svg viewBox="0 0 320 290" role="img" aria-label="'+(isPr?'Precision-Recall':'ROC')+' curve">'+grid+refLine+'<polygon points="44,256 '+pts+' 296,256" fill="var(--accent)" opacity=".14"/><polyline class="draw" pathLength="1" points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/><circle id="evDot" r="7" fill="var(--ember)" stroke="var(--surface)" stroke-width="3"/><text x="170" y="287" text-anchor="middle">'+xLab+'</text><text transform="translate(10 136) rotate(-90)" text-anchor="middle">'+yLab+'</text></svg></div>'+
+      '<div class="evcard"><h4>What the threshold does</h4><div class="sl" style="grid-template-columns:110px 1fr 40px"><span>Alert threshold</span><input type="range" min="20" max="90" step="1" value="'+EV.th+'" data-ev="th" aria-label="Alert threshold"><b id="evThV"></b></div><div id="evDyn"></div></div></div>';
+    evPerfUpdate();
+  }else if(EV.tab==="back"){
+    var bt=evBT();
+    var verifyBadge=evReal()
+      ?'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:rgba(98,182,203,.1);border-left:3px solid var(--accent);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Verification Status:</strong> Verified observational backtesting dataset loaded.</div>'
+      :'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:var(--surface2);border-left:3px solid var(--ember);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Verification Protocol:</strong> Synthetic illustrative replay benchmark. Demonstrates lead-time progression and miss profiles without fabricating historical incident logs. Drop observational FIRMS/MODIS archives into <code>data/backtest.json</code>.</div>';
+    body.innerHTML='<div class="evcard">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><h4>Replay the week before a past fire</h4><span class="dim" style="font-size:12px">Temporal Step: 24h</span></div>'+
+      verifyBadge+
+      '<p class="dim" style="font-size:14px;margin-bottom:12px">Pick a scenario, then scrub or play the days leading up to ignition. The line traces how early environmental risk crossed the alert threshold.</p>'+
+      '<div class="scn">'+bt.map(function(x,i){return '<button class="chipbtn" type="button" data-sc="'+i+'" aria-pressed="'+(i===EV.bt)+'">'+x.name+'</button>'}).join("")+'</div>'+
+      '<div id="evBtStats"></div>'+
+      '<div class="chart" id="evChart"></div>'+
+      '<div class="sl" style="grid-template-columns:90px 1fr 110px;margin-top:10px"><button class="act" type="button" data-evplay="1" id="evPlay">▶ Play</button><input type="range" min="0" max="7" step="1" value="'+EV.idx+'" data-ev="idx" aria-label="Replay day"><b id="evIdxV"></b></div>'+
+      '<div class="expl" id="evBtNote" style="margin-top:8px"></div>'+
+    '</div>';
+    evBtUpdate();
+  }else if(EV.tab==="impact"){
+    var I=impactStats();
+    body.innerHTML='<div class="evstats"><div class="evstat"><b>'+I.n+' of 24</b><span>zones flagged high risk in the 7-day window</span></div><div class="evstat"><b>'+I.minD+' to '+I.maxD+' days</b><span>of warning before a zone turns high risk</span></div><div class="evstat"><b>'+I.funded+' of '+I.n+'</b><span>flagged zones funded from a pool of '+POOL.tankers+' tankers and '+POOL.crews+' crews</span></div><div class="evstat"><b>'+I.gain+' min</b><span>faster water on a fire, on average, with staged units (simulated)</span></div></div>'+
+      '<div class="evgrid"><div class="evcard"><h4>Reactive versus proactive</h4><div class="lead-demo" style="margin:10px 0 0"><div class="lrow" style="grid-template-columns:100px 1fr"><span>Reactive</span><div class="lbar"><span style="flex:3;background:var(--surface2)">No warning</span><span style="flex:1;background:var(--high);color:#1F1740">Ignition</span><span style="flex:2;background:var(--med);color:#1F1740">Crews mobilize</span></div></div><div class="lrow" style="grid-template-columns:100px 1fr"><span>IGNIS AI</span><div class="lbar"><span style="flex:3;background:var(--accent);color:var(--on-accent)">Alert, units staged</span><span style="flex:1;background:var(--high);color:#1F1740">Ignition</span><span style="flex:2;background:var(--surface2)">Crews on site</span></div></div></div><p class="fine">Illustrative timeline, not to scale.</p></div>'+
+      '<div class="evcard"><h4>Resource allocation, this week</h4><table class="itab"><thead><tr><th>Zone</th><th>Alert on</th><th>Tankers</th><th>Reactive</th><th>Staged</th><th>Gain</th></tr></thead><tbody>'+I.rows.map(function(r){return '<tr><td><b>'+r.id+'</b></td><td>Day '+r.day+'</td><td>'+r.t+'</td><td>'+r.r+' min</td><td>'+r.p+' min</td><td class="goodc">'+r.g+' min</td></tr>'}).join("")+'</tbody></table><p class="fine">Assumed: '+SIM_ASSUME.detect+' min to detect, '+SIM_ASSUME.dispatch+' min to dispatch, '+SIM_ASSUME.speed+' km/h road speed, '+SIM_ASSUME.setup+' min setup. Staged units are already in the zone. '+(I.n>I.funded?(I.n-I.funded)+' flagged zone needs mutual aid.':'')+'</p></div></div>';
+  }else{
+    body.innerHTML='<div class="evgrid"><div class="evcard"><h4>Limitations</h4><ul class="dim" style="padding-left:20px;font-size:15px;display:grid;gap:8px"><li>Sentinel-2 revisits a location about every 5 days, so NDVI can be a few days old. Cloud cover can delay it further.</li><li>Weather forecasts lose accuracy toward Day 7.</li><li>Fires started by people can be hard to predict from environmental data alone.</li><li>Alerts, dispatch and village messages in this prototype are simulated.</li><li>Zones, scores and the response simulation on this site use demo data and assumed values.</li></ul></div>'+
+      '<div class="evcard"><h4>How we will validate</h4><ol class="plan"><li><span><b>Split by time.</b> Train on earlier fire seasons and test on a later one, so the model never sees the future.</span></li><li><span><b>Backtest past fires.</b> Replay the week before each fire and record the warning lead time.</span></li><li><span><b>Report misses too.</b> Publish precision, recall and ROC-AUC, plus fires the model missed.</span></li><li><span><b>Pilot with a station.</b> Check whether staged units change real response times.</span></li></ol></div></div>';
+  }
+}
+function evPerfUpdate(){
+  var v=evData(),c=confusion(v,EV.th),tp=c.tp,fp=c.fp,fn=c.fn,tn=c.tn;
+  var pr=tp/Math.max(1,tp+fp),re=tp/Math.max(1,tp+fn),f1=pr+re?2*pr*re/(pr+re):0,far=fp/Math.max(1,fp+tn);
+  $("#evThV").textContent=EV.th;
+  if(EV.curve==="pr"){
+    $("#evDot").setAttribute("cx",(44+re*252).toFixed(1));
+    $("#evDot").setAttribute("cy",(256-pr*240).toFixed(1));
+  }else{
+    $("#evDot").setAttribute("cx",(44+far*252).toFixed(1));
+    $("#evDot").setAttribute("cy",(256-re*240).toFixed(1));
+  }
+  $("#evDyn").innerHTML='<div class="cm"><div></div><div class="h">Fire happened</div><div class="h">No fire</div><div class="h">Alert raised</div><div class="c good"><b>'+tp+'</b>Fires caught</div><div class="c bad"><b>'+fp+'</b>False alarms</div><div class="h">No alert</div><div class="c bad"><b>'+fn+'</b>Fires missed</div><div class="c good"><b>'+tn+'</b>Correctly quiet</div></div>'+
+   '<div class="mchips"><div><b>'+pr.toFixed(2)+'</b>Precision</div><div><b>'+re.toFixed(2)+'</b>Recall</div><div><b>'+f1.toFixed(2)+'</b>F1 score</div><div><b>'+far.toFixed(2)+'</b>False alarm rate</div></div>'+
+   '<p class="dim" style="font-size:14px">At a threshold of '+EV.th+', the model raises '+(tp+fp)+' alerts. It catches '+tp+' of '+(tp+fn)+' fire zone-days ('+Math.round(re*100)+'%), and '+fp+' alerts are false alarms. Lower the threshold to catch more fires, at the cost of more false alarms.</p>';
+}
+function evBtUpdate(){
+  var sc=evBT()[EV.bt],s=sc.scores,idx=EV.idx,TH=THRESH_HIGH,cross=-1,i;
+  for(i=0;i<s.length;i++){if(s[i]>=TH){cross=i;break}}
+  var n=s.length-1,X0=50,XW=560,xp=function(k){return X0+k*XW/n},yp=function(v){return 230-v*2.1};
+  var g='<rect x="50" y="'+yp(100)+'" width="560" height="'+(yp(TH)-yp(100))+'" fill="var(--high)" opacity=".09"/><rect x="50" y="'+yp(TH)+'" width="560" height="'+(yp(40)-yp(TH))+'" fill="var(--med)" opacity=".09"/><rect x="50" y="'+yp(40)+'" width="560" height="'+(yp(0)-yp(40))+'" fill="var(--low)" opacity=".09"/>';
+  g+='<line x1="50" x2="610" y1="'+yp(TH)+'" y2="'+yp(TH)+'" stroke="var(--high)" stroke-dasharray="6 5"/><text x="606" y="'+(yp(TH)-6)+'" text-anchor="end">Alert threshold '+TH+'</text>';
+  [0,40,65,100].forEach(function(t){g+='<text x="44" y="'+(yp(t)+4)+'" text-anchor="end">'+t+'</text>'});
+  for(i=0;i<=n;i++)g+='<text x="'+xp(i)+'" y="252" text-anchor="middle">'+(i===n?"Ignition":"D-"+(n-i))+'</text>';
+  var pts=[];for(i=0;i<=idx;i++)pts.push(xp(i).toFixed(1)+","+yp(s[i]).toFixed(1));
+  if(pts.length>1)g+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--ember)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  for(i=0;i<=idx;i++)g+='<circle cx="'+xp(i)+'" cy="'+yp(s[i])+'" r="'+(i===idx?7:4)+'" fill="'+(i===idx?"var(--ember)":"var(--surface)")+'" stroke="var(--ember)" stroke-width="2.5"/>';
+  if(cross>=0&&idx>=cross)g+='<line x1="'+xp(cross)+'" x2="'+xp(cross)+'" y1="26" y2="230" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 4"/><text x="'+xp(cross)+'" y="18" text-anchor="middle" style="fill:var(--accent);font-weight:700;font-size:12px">IGNIS AI flags the zone</text>';
+  g+='<line x1="'+xp(n)+'" x2="'+xp(n)+'" y1="26" y2="230" stroke="var(--high)" stroke-width="2"/><text x="'+(xp(n)-6)+'" y="40" text-anchor="end" style="fill:var(--high);font-weight:700">Fire</text>';
+  $("#evChart").innerHTML='<svg viewBox="0 0 640 262" role="img" aria-label="Risk score in the week before ignition">'+g+'</svg>';
+  var lead=cross>=0?(n-cross):0;
+  var alertStatus=cross>=0?(idx>=cross?'<span style="color:var(--accent);font-weight:700">ALERT TRIGGERED (D-'+(n-cross)+')</span>':'Pre-threshold'):'<span style="color:var(--high);font-weight:700">BELOW THRESHOLD (MISS)</span>';
+  $("#evBtStats").innerHTML='<div class="evstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:8px">'+
+    '<div class="evstat"><b>'+(cross>=0?lead+" day"+(lead===1?"":"s"):"None")+'</b><span>'+(cross>=0?"warning lead time":"warning given")+'</span></div>'+
+    '<div class="evstat"><b>'+s[idx]+'</b><span>score on '+(idx===n?"ignition day":"D-"+(n-idx))+' · '+sevName(s[idx])+'</span></div>'+
+    '<div class="evstat"><b style="font-size:15px;line-height:2.2">'+alertStatus+'</b><span>incident alert state</span></div>'+
+    '<div class="evstat"><b>'+sc.zone+'</b><span>zone replayed</span></div>'+
+  '</div>';
+  $("#evIdxV").textContent=idx===n?"Ignition":"D-"+(n-idx);
+  $("#evBtNote").textContent=sc.note;
+  var sl=$('[data-ev="idx"]');if(sl)sl.value=idx;
+  var pb=$("#evPlay");if(pb)pb.textContent=EV.playing?"❚❚ Pause":"▶ Play";
+}
+function evPlay(){
+  if(EV.playing){stopEvPlay();evBtUpdate();return}
+  if(EV.idx>=7)EV.idx=0;
+  evBtUpdate();
+  EV.playing=setInterval(function(){if(EV.idx>=7){stopEvPlay();evBtUpdate();return}EV.idx++;evBtUpdate()},750);
+  evBtUpdate();
+}
+$("#sec-evidence").addEventListener("click",function(e){
+  var t=e.target.closest("[data-evtab]");if(t){stopEvPlay();EV.tab=t.getAttribute("data-evtab");EV.idx=7;evRender();return}
+  var cv=e.target.closest("[data-evcurve]");if(cv){EV.curve=cv.getAttribute("data-evcurve");evRender();return}
+  var sc=e.target.closest("[data-sc]");if(sc){stopEvPlay();EV.bt=+sc.getAttribute("data-sc");EV.idx=7;evRender();return}
+  if(e.target.closest("[data-evplay]"))evPlay();
+});
+$("#sec-evidence").addEventListener("input",function(e){
+  var k=e.target.getAttribute("data-ev");
+  if(k==="th"){EV.th=+e.target.value;evPerfUpdate()}
+  else if(k==="idx"){stopEvPlay();EV.idx=+e.target.value;evBtUpdate()}
+});
+evRender();
+
+/* ---------- dashboard ---------- */
+var S={mode:"risk",day:0,ran:false,running:false,selected:null,tab:"zone",acked:{},alerts:[],places:true,terrain:true,playing:null,
+  plan:null,units:[],dispatch:"idle",notified:false,smsFresh:false,sim:null,anim:false,fresh:false,ai:null,pkey:"",
+  briefing:null,briefingHistory:[],chat:[],chatLoading:false,checklists:{}};
+var CFG={server:false,groq:false,db:false};
+async function authenticatedFetch(url,options){
+  if(!supabaseClient)throw new Error("Sign in with Supabase to access saved records.");
+  var sessionResult=await supabaseClient.auth.getSession();
+  if(sessionResult.error)throw sessionResult.error;
+  var session=sessionResult.data&&sessionResult.data.session;
+  if(!session||!session.access_token)throw new Error("Sign in with Supabase to access saved records.");
+  var request=Object.assign({},options||{});
+  request.headers=Object.assign({},request.headers||{},{Authorization:"Bearer "+session.access_token});
+  return fetch(url,request);
+}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var map=null,vb={x:0,y:0,w:900,h:600},inited=false;
+var STAGES=[
+  {n:"Ingest",d:"Pulling weather forecast, Sentinel-2 NDVI and FIRMS fire history",ms:800},
+  {n:"Features",d:"Aligning 5 features across 24 grid zones",ms:700},
+  {n:"Predict",d:"Scoring every zone for Days 1 to 7",ms:900},
+  {n:"Map",d:"Rendering the risk overlay",ms:600},
+  {n:"Alert",d:"Checking zones against the danger threshold",ms:600}
+];
+var DRV={temp:"Temperature",hum:"Dry air",wind:"Wind speed",ndvi:"Dry vegetation",hist:"Fire history"};
+
+function view(){return{mode:S.mode,day:S.day,ran:S.ran,selected:S.selected,places:S.places,terrain:S.terrain}}
+function refresh(){if(!map)return;var rb=$("#run");if(rb)rb.classList.toggle("attn",!S.ran&&!S.running);map.update(view());renderSummary();renderTimeline();renderLegend();renderPanel();drawUnits();$("#hint").hidden=S.ran||S.running}
+function stagedCount(){return S.units.filter(function(u){return u.status==="ready"}).length}
+
+function renderSummary(){
+  var el=$("#summary");
+  if(!S.ran){el.innerHTML='<span class="chip">24 zones</span><span class="chip">7-day window</span><span class="grow">'+(S.running?"Forecast running…":"Forecast not run yet")+'</span>';return}
+  var c=dayCounts(S.day),first=S.alerts[0],sc=stagedCount();
+  el.innerHTML='<span class="chip"><i style="background:var(--high)"></i>'+c.high+' high</span><span class="chip"><i style="background:var(--med)"></i>'+c.med+' medium</span><span class="chip"><i style="background:var(--low)"></i>'+c.low+' low</span>'+(sc?'<span class="chip"><i style="background:var(--accent)"></i>'+sc+' zones staged</span>':'')+
+   '<span class="grow">Day '+(S.day+1)+' · '+dayLabel(S.day)+(first?' · Earliest high risk: Zone '+first.id+' on Day '+(first.day+1):'')+'</span>';
+}
+function renderLegend(){
+  var L=$("#legend");
+  if(S.mode==="risk")L.innerHTML='<span><i class="sw" style="background:var(--low)"></i>Low</span><span><i class="sw" style="background:var(--med)"></i>Medium</span><span><i class="sw" style="background:var(--high)"></i>High</span><span><i class="sw" style="background:var(--ember);border-radius:2px"></i>Fire station</span><span><i class="sw" style="background:var(--accent)"></i>Units staged</span>';
+  else if(S.mode==="ndvi")L.innerHTML='<span><i class="sw" style="background:hsl(40 65% 55%)"></i>Dry vegetation</span><span><i class="sw" style="background:hsl(140 65% 52%)"></i>Healthy vegetation</span><span>Observed NDVI, illustrative</span>';
+  else L.innerHTML='<span><i class="sw" style="background:hsl(20 72% 58%)"></i>Dry air</span><span><i class="sw" style="background:hsl(205 72% 58%)"></i>Humid air</span><span>Forecast humidity</span>';
+}
+function renderTimeline(){
+  var h='<button type="button" class="play" id="play">'+(S.playing?"❚❚ Pause":"▶ Play 7 days")+'</button>';
+  for(var d=0;d<7;d++){
+    var m="";
+    if(S.ran){var c=dayCounts(d);m='<div class="mini"><i style="width:'+c.high/24*100+'%;background:var(--high)"></i><i style="width:'+c.med/24*100+'%;background:var(--med)"></i><i style="width:'+c.low/24*100+'%;background:var(--low)"></i></div>'}
+    else m='<div class="mini"></div>';
+    h+='<button type="button" class="day" data-d="'+d+'" aria-pressed="'+(d===S.day)+'"><b>Day '+(d+1)+'</b><span class="dt">'+dayLabel(d)+'</span>'+m+'</button>';
+  }
+  $("#timeline").innerHTML=h;
+}
+function spark(z){
+  var pts=FC[z.id].map(function(f,i){return[20+i*(360/6),70-f.score*.62]});
+  var line=pts.map(function(p){return p[0].toFixed(0)+","+p[1].toFixed(0)}).join(" ");
+  var ty=function(t){return 70-t*.62};
+  return '<svg class="spark" viewBox="0 0 400 80" role="img" aria-label="Seven day risk trend">'+
+   '<line x1="0" x2="400" y1="'+ty(THRESH_HIGH)+'" y2="'+ty(THRESH_HIGH)+'" stroke="var(--high)" stroke-dasharray="4 4" stroke-opacity=".6"/>'+
+   '<polyline points="'+line+'" fill="none" stroke="var(--ember)" stroke-width="2.5" stroke-linejoin="round"/>'+
+   pts.map(function(p,i){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(i===S.day?6:3)+'" fill="'+(i===S.day?"var(--ember)":"var(--surface)")+'" stroke="var(--ember)" stroke-width="2"/>'}).join("")+'</svg>';
+}
+function explain(z,f){
+  var arr=Object.keys(f.contrib).map(function(k){return[k,f.contrib[k]]}).sort(function(a,b){return b[1]-a[1]});
+  var ph={temp:"temperatures near "+f.temp.toFixed(0)+" °C",hum:"low humidity ("+f.hum.toFixed(0)+"%)",wind:"winds around "+f.wind.toFixed(0)+" km/h",ndvi:"dry vegetation (NDVI "+f.ndvi.toFixed(2)+")",hist:"a history of fire detections nearby"};
+  return "Zone "+z.id+" is rated "+sevName(f.score).toLowerCase()+" on Day "+(S.day+1)+", mainly because of "+ph[arr[0][0]]+" and "+ph[arr[1][0]]+".";
+}
+function action(z,f){
+  var st=nearest(STATIONS,z.cx,z.cy),vl=nearest(VILLAGES,z.cx,z.cy),s=sev(f.score);
+  if(s==="high")return "Pre-position "+(f.score>=70?3:2)+" water tankers and 1 crew at "+st.n+". Send a community advisory to "+vl.n+". Re-run the forecast in 12 hours.";
+  if(s==="med")return "Increase patrols near "+vl.n+" and keep tankers on standby at "+st.n+". Check the next Sentinel-2 pass for vegetation change.";
+  return "Routine monitoring. No action needed.";
+}
+function unitFor(id){return S.units.filter(function(u){return u.id===id})[0]}
+
+function stepBox(n,title,state,body){return '<div class="rstep '+state+'"><div class="rn">'+(state==="done"?"✓":n)+'</div><div class="rb"><h4>'+title+'</h4>'+body+'</div></div>'}
+function renderResponse(){
+  var P=$("#panel");
+  if(!S.ran){P.innerHTML='<div class="empty"><b>Nothing to respond to yet</b>Run the AI forecast first. The response tools use its alerts.</div>';return}
+  if(!S.alerts.length){P.innerHTML='<div class="empty"><b>No high-risk zones</b>Nothing crosses the threshold in the next 7 days.</div>';return}
+  var p=S.plan,planDone=!!p,dispDone=S.dispatch==="done",h="",b;
+  /* step 1 */
+  if(!p) b='<p>Rank the '+S.alerts.length+' alerts by arrival day and score, then assign tankers and crews from the pool of '+POOL.tankers+' tankers and '+POOL.crews+' crews.</p><button class="act" type="button" data-act="plan">Auto-plan response</button>';
+  else{
+    var ut=POOL.tankers-p.left.t,uc=POOL.crews-p.left.c,short=p.items.filter(function(i){return !i.funded});
+    b='<div class="mlab"><span>Tankers assigned</span><span>'+ut+' of '+POOL.tankers+'</span></div><div class="meter"><i style="width:'+ut/POOL.tankers*100+'%"></i></div><div class="mlab"><span>Crews assigned</span><span>'+uc+' of '+POOL.crews+'</span></div><div class="meter"><i style="width:'+uc/POOL.crews*100+'%"></i></div><div style="margin-top:8px">'+
+      p.items.map(function(i){var u=unitFor(i.id),st=!i.funded?'<span class="no">Needs aid</span>':!u||u.status==="idle"?'<span class="ok">Funded</span>':u.status==="moving"?'<span class="go">En route</span>':'<span class="ok">In position</span>';
+        return '<div class="pl"><b>Zone '+i.id+'</b><span>Day '+(i.day+1)+' · '+i.t+' tankers + '+i.c+' crew<small>from '+i.station.n+'</small></span>'+st+'</div>'}).join("")+'</div>'+
+      (short.length?'<p class="fine">'+short.length+' zone'+(short.length>1?'s exceed':' exceeds')+' the pool. Request mutual aid for '+short.map(function(i){return i.id}).join(", ")+'.</p>':'');
+  }
+  h+=stepBox(1,"Plan resources",planDone?"done":"active",b);
+  /* step 2 */
+  if(!planDone) b='<p>Send funded units from their stations to the zones.</p>';
+  else if(S.dispatch==="idle") b='<p>Move tankers and crews so they are in position before each zone peaks.</p><button class="act" type="button" data-act="dispatch">Dispatch units</button>';
+  else if(S.dispatch==="moving") b='<p>Units are driving to their zones. Watch the map.</p>';
+  else b='<p>All funded units are staged in their zones.</p>';
+  h+=stepBox(2,"Stage the trucks",!planDone?"locked":dispDone?"done":"active",b);
+  /* step 3 */
+  if(!planDone) b='<p>Warn the nearest villages about high-risk days.</p>';
+  else if(!S.notified) b='<p>Send a plain-language advisory to each village near a high-risk zone.</p><button class="act" type="button" data-act="notify">Send community advisories</button>';
+  else{
+    var vm={};S.alerts.forEach(function(a){var z=zoneById(a.id),v=nearest(VILLAGES,z.cx,z.cy);if(vm[v.n]===undefined||a.day<vm[v.n])vm[v.n]=a.day});
+    var names=Object.keys(vm),k=0;
+    b=names.map(function(n){return '<div class="sms" style="animation-delay:'+(S.smsFresh?(k++)*320:0)+'ms"><div class="sh">To: residents of '+n+'</div>Fire risk is high near '+n+' on '+dayLabel(vm[n])+'. Do not burn waste or light open fires. Keep vehicles fueled and the road clear for fire trucks.<div class="hi">जंगल में आग का खतरा अधिक है। खुले में आग न जलाएं।</div><div class="sf">Simulated message, not sent</div></div>'}).join("");
+    S.smsFresh=false;
+  }
+  h+=stepBox(3,"Warn the villages",!planDone?"locked":S.notified?"done":"active",b);
+  /* step 4 */
+  if(!dispDone) b='<p>Once units are staged, start a simulated fire and compare response times.</p>';
+  else if(!S.sim){
+    var rz=S.units.filter(function(u){return u.status==="ready"});
+    b='<p>Pick a staged zone and start a test fire there.</p><select class="simzone" id="simZone" aria-label="Zone for test fire">'+rz.map(function(u){return '<option value="'+u.id+'"'+(u.id===S.selected?" selected":"")+'>Zone '+u.id+'</option>'}).join("")+'</select><button class="act wide" type="button" data-act="sim">Start test fire</button>';
+  }else{
+    var t=simTimes(S.sim.zid),R=t.react,Pp=t.prep,gain=R.total-Pp.total,shown=S.sim.shown;
+    b='<div class="race"><div class="rr"><div class="top2"><span>Without IGNIS AI</span><b>'+R.total+' min</b></div><div class="rbar"><i class="react" data-w="100%" style="'+(shown?"width:100%":"transition-duration:"+(R.total*.04).toFixed(2)+"s")+'"></i></div><div class="fine" style="margin-top:3px">Detect '+R.detect+' + dispatch '+R.dispatch+' + drive '+R.drive+' + setup '+R.setup+'</div></div>'+
+      '<div class="rr"><div class="top2"><span>With staged units</span><b>'+Pp.total+' min</b></div><div class="rbar"><i class="prep" data-w="'+(Pp.total/R.total*100).toFixed(1)+'%" style="'+(shown?"width:"+(Pp.total/R.total*100).toFixed(1)+"%":"transition-duration:"+(Pp.total*.04).toFixed(2)+"s")+'"></i></div><div class="fine" style="margin-top:3px">Detect '+Pp.detect+' + on site '+Pp.drive+' + setup '+Pp.setup+'</div></div></div>'+
+      '<div class="gain"><b>'+gain+' min sooner</b>Water reaches the fire in Zone '+S.sim.zid+' '+gain+' minutes faster ('+Math.round(gain/R.total*100)+'% less time).</div>'+
+      '<p class="fine">Simulation with assumed values: '+SIM_ASSUME.detect+' min to detect, '+SIM_ASSUME.dispatch+' min to dispatch, '+SIM_ASSUME.speed+' km/h road speed, '+SIM_ASSUME.setup+' min setup, '+t.km.toFixed(0)+' km from '+t.station.n+'. Not a measured result.</p>'+
+      '<button class="act sec wide" type="button" data-act="resetsim">Run another test</button>';
+  }
+  h+=stepBox(4,"Test it with a simulated fire",!dispDone?"locked":S.sim?"done":"active",b);
+  P.innerHTML=h;
+  if(S.sim&&!S.sim.shown){S.sim.shown=true;requestAnimationFrame(function(){requestAnimationFrame(function(){$$(".rbar i").forEach(function(e){e.style.width=e.getAttribute("data-w")})})})}
+}
+function renderPanel(){
+  $("#tabZone").setAttribute("aria-selected",S.tab==="zone");
+  $("#tabAlerts").setAttribute("aria-selected",S.tab==="alerts");
+  $("#tabResp").setAttribute("aria-selected",S.tab==="response");
+  $("#tabBriefing").setAttribute("aria-selected",S.tab==="briefing");
+  $("#tabAsk").setAttribute("aria-selected",S.tab==="ask");
+  var P=$("#panel"),cnt=$("#alertCount"),open=S.alerts.filter(function(a){return !S.acked[a.id]}).length;
+  cnt.hidden=!(S.ran&&open);cnt.textContent=open;
+  var pk=S.tab+":"+(S.tab==="zone"?S.selected:"");if(pk!==S.pkey){S.pkey=pk;P.classList.remove("pin");void P.offsetWidth;P.classList.add("pin")}
+  if(S.tab==="response"){renderResponse();return}
+  if(S.tab==="briefing"){renderBriefing();return}
+  if(S.tab==="ask"){renderAsk();return}
+  if(S.tab==="alerts"){
+    if(!S.ran){P.innerHTML='<div class="empty"><b>No alerts yet</b>Run the AI forecast. Zones that cross the danger threshold will appear here.</div>';return}
+    if(!S.alerts.length){P.innerHTML='<div class="empty"><b>No high-risk zones</b>Nothing crosses the threshold in the next 7 days.</div>';return}
+    var h='<p class="sim">Simulated alerts for station commanders. Evacuation notices require officer confirmation.</p>';
+    var SOP_ITEMS=[
+      "Confirm tanker water refill & hydrant pressure",
+      "Alert nearest village mukhiya & forest guard",
+      "Stage primary tanker crew at forward staging point",
+      "Inspect ingress/egress road clearance"
+    ];
+    S.alerts.forEach(function(a,i){
+      var z=zoneById(a.id),f=FC[a.id][a.day],ack=S.acked[a.id],u=unitFor(a.id);
+      var st=nearest(STATIONS,z.cx,z.cy),km=Math.hypot(st.x-z.cx,st.y-z.cy)*KM_PER_UNIT;
+      var tacBadge=f.wind>=16||km>=16?{t:"INDIRECT CONTAINMENT & ANCHOR",bg:"var(--high)"}:a.score>=75?{t:"DIRECT ATTACK & PRE-POSITIONING",bg:"var(--high)"}:{t:"ACTIVE PATROL & ADVANCE WARNING",bg:"var(--med)"};
+      var clHtml='<div class="sop-checklist"><div class="sop-title"><span>Station SOP Checklist</span><span class="fine">'+
+        SOP_ITEMS.filter(function(_,idx){return !!S.checklists[a.id+"_"+idx]}).length+'/'+SOP_ITEMS.length+' Verified</span></div>'+
+        SOP_ITEMS.map(function(item,idx){
+          var cid=a.id+"_"+idx,checked=!!S.checklists[cid];
+          return '<label class="sop-item'+(checked?' done':'')+'"><input type="checkbox" data-sop="'+cid+'" data-zid="'+a.id+'"'+(checked?' checked':'')+'><span>'+item+'</span></label>';
+        }).join("")+'</div>';
+
+      h+='<div class="alert'+(ack?" ack":"")+'" style="animation-delay:'+(S.fresh?i*260:0)+'ms">'+
+        '<h5><span>Zone '+a.id+' · High risk</span><span>Day '+(a.day+1)+' · '+a.score+'</span></h5>'+
+        '<div style="margin:4px 0 6px"><span class="tactical-badge" style="background:'+tacBadge.bg+';color:#08202A">'+tacBadge.t+'</span></div>'+
+        '<p>'+action(z,f)+(u&&u.status==="ready"?' <b style="color:var(--accent)">Units in position.</b>':'')+'</p>'+
+        clHtml+
+        '<div class="fine" style="border-left:2px solid var(--med);padding-left:8px;margin:6px 0 8px;font-size:11.5px"><b>Human-in-the-Loop Protocol:</b> Evacuation advisories are officer-discretion recommendations. Automated evacuation dispatch is strictly disabled.</div>'+
+        '<div class="row"><button type="button" data-view="'+a.id+'" data-d="'+a.day+'">View on map</button><button type="button" data-ack="'+a.id+'" data-day="'+(a.day+1)+'">'+(ack?"Acknowledged":"Acknowledge")+'</button></div></div>';
+    });
+    h+='<button class="act wide" type="button" data-act="toresp">Plan the response</button>';
+    P.innerHTML=h;S.fresh=false;return;
+  }
+  if(!S.ran){P.innerHTML='<div class="empty"><b>Run the forecast first</b>Then click any zone on the map to see its risk score, the factors behind it and the recommended action.</div>';return}
+  if(!S.selected){P.innerHTML='<div class="empty"><b>Pick a zone</b>Click any zone on the map, or open the Alerts tab and choose one.</div>';return}
+  var z=zoneById(S.selected),f=FC[z.id][S.day],tot=0,k;
+  for(k in f.contrib)tot+=f.contrib[k];
+  var allDrivers=Object.keys(f.contrib).map(function(k){return[k,f.contrib[k]]}).sort(function(a,b){return b[1]-a[1]});
+  var uu=unitFor(z.id);
+  var regAvg=Math.round(ZONES.reduce(function(acc,zone){return acc+FC[zone.id][S.day].score},0)/24);
+  var diff=f.score-regAvg;
+  var diffText=(diff>=0?"+"+diff:diff)+" pts vs regional average ("+regAvg+")";
+  var diffCol=diff>10?"var(--high)":diff>0?"var(--med)":"var(--low)";
+
+  var hazards=[];
+  if(f.hum<=25)hazards.push({l:"CRITICAL DRY AIR ("+Math.round(f.hum)+"%)",c:"var(--high)"});
+  else if(f.hum<=35)hazards.push({l:"DRY AIR ("+Math.round(f.hum)+"%)",c:"var(--med)"});
+  if(f.wind>=16)hazards.push({l:"HIGH WIND SPREAD ("+Math.round(f.wind)+" km/h)",c:"var(--high)"});
+  else if(f.wind>=11)hazards.push({l:"MODERATE WIND ("+Math.round(f.wind)+" km/h)",c:"var(--med)"});
+  if(f.temp>=36)hazards.push({l:"EXTREME HEAT ("+Math.round(f.temp)+"°C)",c:"var(--high)"});
+  if(f.ndvi<=0.40)hazards.push({l:"HIGH FUEL DRYNESS",c:"var(--high)"});
+  else if(f.ndvi<=0.50)hazards.push({l:"MODERATE FUEL DRYNESS",c:"var(--med)"});
+  if(!hazards.length)hazards.push({l:"BASELINE CONDITIONS",c:"var(--low)"});
+
+  var st=nearest(STATIONS,z.cx,z.cy),km=Math.hypot(st.x-z.cx,st.y-z.cy)*KM_PER_UNIT;
+  var tac=f.wind>=16||km>=16?{t:"INDIRECT SUPPRESSION & DEFENSIVE STAGING",col:"var(--high)",act:"High wind and travel distance ("+km.toFixed(0)+" km from "+st.n.split(",")[0]+") favor establishing fuel breaks and pre-warning "+nearest(VILLAGES,z.cx,z.cy).n+"."}:f.score>=65?{t:"RAPID DIRECT ATTACK & WATER PRE-POSITIONING",col:"var(--high)",act:"Pre-position tankers at "+st.n+". Early containment prevents fire spread into adjacent canopy."}:{t:"MONITORING & NORMAL READINESS",col:"var(--low)",act:"Maintain routine watch. Station resources remain on standard readiness."};
+
+  P.innerHTML='<div class="zhead"><div><h3>Zone '+z.id+'</h3><span class="sev '+sev(f.score)+'">'+sevName(f.score)+'</span><div style="font-size:13px;color:var(--muted);margin-top:6px">Day '+(S.day+1)+' · '+dayLabel(S.day)+'</div></div><div class="bigscore">'+f.score+'<small>risk score of 100</small><div class="fine" style="color:'+diffCol+';font-weight:700;font-size:11.5px;margin-top:4px">'+diffText+'</div></div></div>'+
+   '<div class="hazard-pills">'+hazards.map(function(h){return '<span class="tactical-badge" style="background:'+h.c+';color:#08202A">'+h.l+'</span>'}).join("")+'</div>'+
+   '<div class="blk"><h4>7-day trend</h4>'+spark(z)+'</div>'+
+   '<div class="blk"><h4>Conditions on this day</h4><div class="vars"><div><b>'+f.temp.toFixed(0)+' °C</b>Temperature</div><div><b>'+f.hum.toFixed(0)+'%</b>Humidity</div><div><b>'+f.wind.toFixed(0)+' km/h</b>Wind</div><div><b>'+f.ndvi.toFixed(2)+'</b>NDVI</div><div><b>'+(f.hist*100).toFixed(0)+'%</b>Fire history</div><div><b>'+nearest(VILLAGES,z.cx,z.cy).n+'</b>Nearest village</div></div></div>'+
+   '<div class="blk"><h4>Factor Contribution Breakdown (5 Signals)</h4>'+allDrivers.map(function(t){
+     var p=tot?t[1]/tot*100:0;
+     var rawText=t[0]==="temp"?f.temp.toFixed(0)+" °C":t[0]==="hum"?f.hum.toFixed(0)+"%":t[0]==="wind"?f.wind.toFixed(0)+" km/h":t[0]==="ndvi"?"NDVI "+f.ndvi.toFixed(2):(f.hist*100).toFixed(0)+"% hist";
+     return '<div class="drv"><span>'+DRV[t[0]]+' <small class="dim" style="font-size:11px">('+rawText+')</small></span><div class="bar"><i style="width:'+p+'%"></i></div><span>'+p.toFixed(0)+'%</span></div>';
+   }).join("")+'</div>'+
+   '<div class="blk"><div class="expl">'+explain(z,f)+'</div></div>'+
+   '<div class="blk"><h4>Tactical Suppression Assessment</h4><div class="action" style="border-left-color:'+tac.col+'"><span class="tactical-badge" style="background:'+tac.col+';color:#08202A">'+tac.t+'</span><p style="margin-top:4px">'+tac.act+(uu&&uu.status==="ready"?'<br><b style="color:var(--accent)">Units are staged in this zone.</b>':'')+'</p></div></div>'+
+   aiBlock(z,f)+'<div class="tags"><span class="pill fc">Weather: forecast</span><span class="pill obs">NDVI and fire history: observed</span><span class="pill ill">Score: demo scoring function</span></div>';
+}
+
+
+/* ---------- Utilities: Copy & Export ---------- */
+function copyText(txt, btn) {
+  if (!txt) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(function() {
+      if (btn) {
+        var p = btn.innerHTML;
+        btn.innerHTML = "✓ Copied!";
+        setTimeout(function() { btn.innerHTML = p; }, 1800);
+      }
+    }).catch(function() {
+      if (btn) {
+        var p = btn.innerHTML;
+        btn.innerHTML = "✓ Copied!";
+        setTimeout(function() { btn.innerHTML = p; }, 1800);
+      }
+    });
+  } else {
+    var ta = document.createElement("textarea");
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch(e){}
+    document.body.removeChild(ta);
+    if (btn) {
+      var p = btn.innerHTML;
+      btn.innerHTML = "✓ Copied!";
+      setTimeout(function() { btn.innerHTML = p; }, 1800);
+    }
+  }
+}
+
+function exportBriefing() {
+  if (!S.briefing || !S.briefing.data) return;
+  var b = S.briefing.data;
+  var txt = "========================================================\n" +
+    "IGNIS AI - OPERATIONAL FIRE DANGER BRIEFING\n" +
+    "========================================================\n\n" +
+    "TITLE: " + b.title + "\n" +
+    "THREAT LEVEL: " + (b.threatLevel || "HIGH").toUpperCase() + "\n" +
+    "TIMESTAMP: " + new Date().toLocaleString() + "\n" +
+    "OFFICER IN CHARGE: " + (APP_USER.name || "Station Officer") + " (" + (APP_USER.email || "Guest Session") + ")\n" +
+    "FORECAST WINDOW: Days 1 to 7\n" +
+    "FLAGGED HIGH-RISK ZONES: " + S.alerts.length + "\n\n" +
+    "--------------------------------------------------------\n" +
+    "1. EXECUTIVE SUMMARY\n" +
+    "--------------------------------------------------------\n" +
+    b.summary + "\n\n" +
+    "--------------------------------------------------------\n" +
+    "2. CRITICAL METEOROLOGICAL HAZARDS\n" +
+    "--------------------------------------------------------\n" +
+    (b.keyRisks || []).map(function(k, i) { return (i + 1) + ". " + k; }).join("\n") + "\n\n" +
+    "--------------------------------------------------------\n" +
+    "3. TACTICAL STAGING & COMMUNITY ADVISORIES\n" +
+    "--------------------------------------------------------\n" +
+    (b.stagedRecommendations || []).map(function(r, i) { return (i + 1) + ". " + r; }).join("\n") + "\n\n" +
+    "--------------------------------------------------------\n" +
+    "4. COMPLETE ROLL-CALL BRIEFING TEXT\n" +
+    "--------------------------------------------------------\n" +
+    b.briefingText + "\n\n" +
+    "========================================================\n" +
+    "DISCLAIMER: Generated by IGNIS AI prototype for incident command exercise.\n" +
+    "========================================================\n";
+
+  var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "IGNIS_AI_Briefing_Day_" + (S.day + 1) + ".txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function loadBriefingHistory() {
+  if (!CFG.server) return;
+  authenticatedFetch("/api/briefings?limit=5")
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(res) {
+      if (res && res.briefings) {
+        S.briefingHistory = res.briefings;
+        if (S.tab === "briefing") renderBriefing();
+      }
+    })
+    .catch(function() {});
+}
+
+/* ---------- AI Briefing & Chat Controllers ---------- */
+function renderBriefing() {
+  var P = $("#panel");
+  if (!S.ran) {
+    P.innerHTML = '<div class="empty"><b>Forecast required</b>Run the AI forecast first. The executive briefing compiles predictions across all 24 zones.</div>';
+    return;
+  }
+  var h = '<div class="zhead" style="margin-bottom:12px"><div><h3>Executive Briefing</h3><div style="font-size:13px;color:var(--muted)">Operational 24–72h Wildfire Risk Report</div></div></div>';
+  if (!CFG.groq) {
+    h += '<div class="aibox" style="margin-bottom:12px"><b>Groq API Key Required</b>Add <code>GROQ_API_KEY</code> to your <code>.env</code> file to generate live tactical briefings with Llama 3.3.</div>';
+  }
+  var b = S.briefing;
+  if (b && b.state === "loading") {
+    h += '<div class="briefing-box"><div class="aiload"><i></i><i></i><i></i> Generating operational briefing with Groq AI…</div><p class="fine">Analyzing 7-day weather matrices, active alerts, and station staging priorities.</p></div>';
+  } else if (b && b.state === "error") {
+    h += '<div class="briefing-box"><div class="expl" style="border-left-color:var(--high)">' + esc(b.error) + '</div><button class="act wide" type="button" data-act="genbriefing" style="margin-top:10px">Retry Briefing</button></div>';
+  } else if (b && b.state === "ok" && b.data) {
+    var d = b.data;
+    var sevCol = d.threatLevel === "high" ? "var(--high)" : d.threatLevel === "moderate" ? "var(--med)" : "var(--low)";
+    h += '<div class="briefing-box"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h5>' + esc(d.title) + '</h5><span class="sev" style="background:' + sevCol + '">' + (d.threatLevel || "HIGH").toUpperCase() + ' THREAT</span></div>' +
+      '<div class="fine" style="margin-bottom:10px">Compiled for Day ' + (S.day + 1) + ' · ' + dayLabel(S.day) + ' · ' + S.alerts.length + ' high-risk zones flagged</div>' +
+      '<div class="expl">' + esc(d.summary) + '</div>' +
+      '<div style="font-size:13px;font-weight:700;margin-top:12px;color:#fff">Critical Meteorological Risks</div>' +
+      '<ul class="ailist">' + (d.keyRisks || []).map(function(k) { return '<li>' + esc(k) + '</li>'; }).join("") + '</ul>' +
+      '<div style="font-size:13px;font-weight:700;margin-top:8px;color:#fff">Tactical Staging & Advisories</div>' +
+      '<ul class="ailist">' + (d.stagedRecommendations || []).map(function(r) { return '<li>' + esc(r) + '</li>'; }).join("") + '</ul>' +
+      '<div class="briefing-bar">' +
+        '<button class="btn-copy" type="button" data-act="copybriefing" style="padding:7px 12px;font-size:12.5px;background:var(--surface)">📋 Copy Briefing</button>' +
+        '<button class="btn-copy" type="button" data-act="exportbriefing" style="padding:7px 12px;font-size:12.5px;background:var(--surface)">💾 Export (.txt)</button>' +
+        '<button class="btn-copy" type="button" data-act="genbriefing" style="padding:7px 12px;font-size:12.5px;background:var(--surface)">🔄 Regenerate</button>' +
+      '</div></div>';
+  } else {
+    h += '<div class="briefing-box"><h5>Generate Tactical Briefing</h5><p class="fine" style="margin:6px 0 12px">Synthesizes all 24 zones, weather hazards, active alerts and station resources into a formal roll-call briefing.</p><button class="act wide" type="button" data-act="genbriefing"' + (!CFG.groq ? " disabled" : "") + '>Generate Operational Briefing</button></div>';
+  }
+
+  if (S.briefingHistory && S.briefingHistory.length) {
+    h += '<div class="blk"><h4>Saved Briefings History</h4><div class="briefing-history">' +
+      S.briefingHistory.map(function(bh) {
+        return '<div class="briefing-item"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><b style="color:#fff">' + esc(bh.title) + '</b><span class="fine">' + new Date(bh.createdAt).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) + '</span></div><p class="fine">' + esc(bh.summary || bh.content).slice(0, 110) + '…</p><button class="btn-copy" style="margin-top:6px" data-viewbriefing="' + bh.id + '">View briefing</button></div>';
+      }).join("") + '</div></div>';
+  }
+  P.innerHTML = h;
+}
+
+function renderAsk() {
+  var P = $("#panel");
+  if (!S.ran) {
+    P.innerHTML = '<div class="empty"><b>Forecast required</b>Run the AI forecast first to ask questions about current fire risks and field assets.</div>';
+    return;
+  }
+  var zText = S.selected ? "Zone " + S.selected : "All zones";
+  var fDayText = "Day " + (S.day + 1);
+  var h = '<div class="chat-wrap"><div class="zhead"><div><h3>Commander Assistant</h3><div style="font-size:13px;color:var(--muted)">Grounded in active forecast & alert state</div></div></div>' +
+    '<div class="chat-ctx"><span><b>Grounded Context:</b></span><span>' + fDayText + '</span><span>·</span><span>' + zText + '</span><span>·</span><span>' + S.alerts.length + ' Alerts</span><span>·</span><span>' + stagedCount() + ' Staged</span></div>' +
+    '<div class="chips">' +
+      '<button type="button" class="chip-prompt" data-q="What are the primary hazards on Day ' + (S.day + 1) + ' in ' + zText + '?">Day ' + (S.day + 1) + ' Hazards in ' + zText + '</button>' +
+      '<button type="button" class="chip-prompt" data-q="Which villages need community advisories first based on active alerts?">Villages at Risk</button>' +
+      '<button type="button" class="chip-prompt" data-q="How should we position tankers if wind speed increases by 10 km/h?">Wind Escalation Tactic</button>' +
+      '<button type="button" class="chip-prompt" data-q="Explain why ' + zText + ' has its current score.">Explain ' + zText + ' Score</button>' +
+    '</div>' +
+    '<div class="chat-feed" id="chatFeed">';
+
+  if (!S.chat || !S.chat.length) {
+    h += '<div class="chat-bubble assistant"><b style="display:block;margin-bottom:4px;color:var(--accent)">IGNIS AI Ready</b>Ask any tactical or forecast question. Answers are strictly verified against the current 7-day model output.<div class="fine" style="margin-top:6px">Click one of the suggested prompt chips above or type a question below.</div></div>';
+  } else {
+    S.chat.forEach(function(msg, idx) {
+      if (msg.role === "user") {
+        h += '<div class="chat-bubble user"><div>' + esc(msg.text) + '</div><div class="bubble-foot" style="justify-content:flex-end"><span>' + msg.ts + '</span></div></div>';
+      } else {
+        h += '<div class="chat-bubble assistant"><div>' + esc(msg.text) + '</div>' +
+          (msg.action ? '<div class="act-callout"><b>Tactical Action:</b> ' + esc(msg.action) + '</div>' : '') +
+          '<div class="bubble-foot"><span>' + msg.ts + '</span><button class="btn-copy" type="button" data-copychat="' + idx + '">📋 Copy</button></div></div>';
+      }
+    });
+  }
+
+  if (S.chatLoading) {
+    h += '<div class="chat-bubble assistant"><div class="aiload"><i></i><i></i><i></i> Analyzing forecast context…</div></div>';
+  }
+
+  h += '</div>' +
+    '<form class="chat-form" id="chatForm">' +
+      '<input type="text" id="chatInput" placeholder="Ask about risks, weather drivers, or staging..." autocomplete="off"' + (S.chatLoading || !CFG.groq ? " disabled" : "") + '>' +
+      '<button type="submit"' + (S.chatLoading || !CFG.groq ? " disabled" : "") + '>Ask</button>' +
+    '</form>' +
+    (!CFG.groq ? '<div class="fine" style="color:var(--med);margin-top:4px">Add GROQ_API_KEY to .env to enable the interactive assistant.</div>' : '') +
+    '</div>';
+
+  P.innerHTML = h;
+  var feed = $("#chatFeed"); if (feed) feed.scrollTop = feed.scrollHeight;
+}
+
+function doBriefing() {
+  if (!S.ran) return;
+  S.briefing = { state: "loading" };
+  renderPanel();
+  var topRisks = [];
+  ZONES.forEach(function(z) {
+    var f = FC[z.id][S.day];
+    if (f.score >= THRESH_MED) {
+      topRisks.push({ id: z.id, score: f.score, temp: +f.temp.toFixed(1), hum: Math.round(f.hum), wind: Math.round(f.wind), ndvi: +f.ndvi.toFixed(2) });
+    }
+  });
+  topRisks.sort(function(a, b) { return b.score - a.score; });
+  var payload = {
+    day: S.day + 1,
+    alerts: S.alerts.map(function(a) { return { zoneId: a.id, day: a.day + 1, score: a.score }; }),
+    topRisks: topRisks.slice(0, 8),
+    villages: VILLAGES.map(function(v) { return v.n; }),
+    stations: STATIONS.map(function(s) { return s.n; })
+  };
+  fetch("/api/ai-briefing", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+  .then(function(res) {
+    if (!res.ok) throw new Error((res.j && res.j.error) || "Failed to generate briefing.");
+    S.briefing = { state: "ok", data: res.j };
+    renderPanel();
+    if (CFG.server) {
+      authenticatedFetch("/api/briefings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: res.j.title,
+          threatLevel: res.j.threatLevel,
+          summary: res.j.summary,
+          content: res.j.briefingText,
+          actions: res.j.stagedRecommendations
+        })
+      }).then(loadBriefingHistory).catch(function() {});
+    }
+  })
+  .catch(function(e) {
+    S.briefing = { state: "error", error: e.message || "Could not generate briefing." };
+    renderPanel();
+  });
+}
+
+function doChat(q) {
+  var question = String(q || "").trim();
+  if (!question) return;
+  if (!S.chat) S.chat = [];
+  S.chat.push({ role: "user", text: question, ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) });
+  S.chatLoading = true;
+  renderPanel();
+
+  var alertsSummary = S.alerts.slice(0, 8).map(function(a) {
+    return "Zone " + a.id + " (Day " + (a.day + 1) + ", score " + a.score + ")";
+  });
+  var zoneConditions = null;
+  if (S.selected) {
+    var z = zoneById(S.selected), f = FC[z.id][S.day];
+    zoneConditions = { zone: z.id, score: f.score, tempC: +f.temp.toFixed(1), humPct: Math.round(f.hum), windKmh: Math.round(f.wind), ndvi: +f.ndvi.toFixed(2) };
+  }
+  var payload = {
+    question: question,
+    context: {
+      day: S.day + 1,
+      selectedZone: S.selected,
+      alertCount: S.alerts.length,
+      stagedCount: stagedCount(),
+      alertsSummary: alertsSummary,
+      zoneConditions: zoneConditions
+    }
+  };
+  fetch("/api/ai-chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+  .then(function(res) {
+    S.chatLoading = false;
+    if (!res.ok) throw new Error((res.j && res.j.error) || "Chat request failed.");
+    S.chat.push({
+      role: "assistant",
+      text: res.j.reply,
+      action: res.j.suggestedAction,
+      ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    });
+    renderPanel();
+  })
+  .catch(function(e) {
+    S.chatLoading = false;
+    S.chat.push({
+      role: "assistant",
+      text: "Unable to reach Groq AI: " + (e.message || "Please check your connection and GROQ_API_KEY in .env."),
+      action: "Verify GROQ_API_KEY in .env or try again.",
+      ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    });
+    renderPanel();
+  });
+}
+
+/* ---------- Groq explanation (server-side route; the key never reaches the browser) ---------- */
+function aiBlock(z,f){
+  if(!CFG.groq)return '<div class="blk"><div class="aibox"><b>AI explanation</b>Appears here when the server has a Groq API key. The AI only explains the model’s numbers. It never sets the score.</div></div>';
+  var key=z.id+":"+S.day,a=S.ai&&S.ai.key===key?S.ai:null,out="",busy=a&&a.state==="loading";
+  if(busy)out='<div class="aiload"><i></i><i></i><i></i> Asking Groq…</div>';
+  else if(a&&a.state==="error")out='<div class="expl">'+esc(a.error)+'</div>';
+  else if(a&&a.state==="ok"){
+    var d=a.data,li=function(x){return '<ul class="ailist">'+(x||[]).map(function(t){return '<li>'+esc(t)+'</li>'}).join("")+'</ul>'};
+    out='<span class="aitag">Written by Groq</span><div class="expl">'+esc(d.explanation)+'</div><div style="font-size:13px;font-weight:700;margin-top:8px">Main factors</div>'+li(d.factors)+'<div style="font-size:13px;font-weight:700">Suggested actions</div>'+li(d.actions)+'<div class="fine">Generated from the model’s numbers. It does not change the score.</div>';
+  }
+  return '<div class="blk"><h4>AI explanation</h4>'+out+'<button class="act sec wide" type="button" data-ai="1"'+(busy?" disabled":"")+'>'+(a&&a.state==="ok"?"Explain again":"Explain with AI")+'</button><button class="btn-guest" type="button" data-act="askzone" data-zid="'+z.id+'" style="margin-top:6px;width:100%;text-align:center">Ask Assistant about Zone '+z.id+' →</button></div>';
+}
+function doAI(){
+  var z=zoneById(S.selected);if(!z)return;
+  var f=FC[z.id][S.day],key=z.id+":"+S.day,tot=0,k;
+  for(k in f.contrib)tot+=f.contrib[k];
+  var drivers=Object.keys(f.contrib).map(function(k){return{key:k,pct:Math.round(f.contrib[k]/(tot||1)*100)}}).sort(function(a,b){return b.pct-a.pct}).slice(0,3);
+  var payload={zoneId:z.id,day:S.day+1,score:f.score,drivers:drivers,
+    conditions:{tempC:+f.temp.toFixed(1),humidityPct:Math.round(f.hum),windKmh:Math.round(f.wind),ndvi:+f.ndvi.toFixed(2),fireHistory:+f.hist.toFixed(2)},
+    nearestVillage:nearest(VILLAGES,z.cx,z.cy).n,station:nearest(STATIONS,z.cx,z.cy).n};
+  S.ai={key:key,state:"loading"};renderPanel();
+  fetch("/api/ai-explain",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+    .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})})
+    .then(function(res){if(!res.ok)throw new Error((res.j&&res.j.error)||"The AI request failed.");S.ai={key:key,state:"ok",data:res.j};renderPanel()})
+    .catch(function(e){S.ai={key:key,state:"error",error:e.message||"Could not reach the server."};renderPanel()});
+}
+function persistAlerts(){
+  if(!CFG.server)return;
+  try{authenticatedFetch("/api/alerts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({alerts:S.alerts.map(function(a){return{zoneId:a.id,day:a.day+1,score:a.score}})})}).catch(function(){})}catch(e){}
+}
+
+/* ---------- Supabase Auth & Session Management ---------- */
+var supabaseClient = null;
+var APP_USER = { id: null, email: null, name: "Guest Officer", isGuest: true };
+var authMode = "signin";
+
+function updateAuthUI() {
+  var btn = $("#btnAuthOpen"), av = $("#authAvatar"), lbl = $("#authLabel");
+  var nameEl = $("#authUserName"), emailEl = $("#authUserEmail"), stEl = $("#authStatusText");
+  if (!btn) return;
+  if (!APP_USER.isGuest && APP_USER.email) {
+    lbl.textContent = APP_USER.name || APP_USER.email.split("@")[0];
+    av.classList.add("logged");
+    av.textContent = (APP_USER.name || APP_USER.email)[0].toUpperCase();
+    if (nameEl) nameEl.textContent = APP_USER.name || "Station Officer";
+    if (emailEl) emailEl.textContent = APP_USER.email;
+    if (stEl) stEl.textContent = CFG.supabaseUrl ? "Supabase Authenticated" : "Demo Officer";
+    var sbDot = $("#authSupabaseStatus i");
+    if (sbDot) sbDot.style.background = "var(--low)";
+  } else {
+    lbl.textContent = "Sign In";
+    av.classList.remove("logged");
+    av.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+    if (nameEl) nameEl.textContent = "Guest Officer";
+    if (emailEl) emailEl.textContent = "demo@ignis.ai";
+    if (stEl) stEl.textContent = CFG.supabaseUrl ? "Signed Out" : "Guest Mode (Demo)";
+    var sbDot = $("#authSupabaseStatus i");
+    if (sbDot) sbDot.style.background = CFG.supabaseUrl ? "var(--med)" : "var(--accent)";
+  }
+}
+
+function setSessionUser(u) {
+  if (u && u.email) {
+    var meta = u.user_metadata || {};
+    APP_USER = {
+      id: u.id,
+      email: u.email,
+      name: meta.full_name || meta.name || u.email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, function(l){return l.toUpperCase()}),
+      isGuest: false
+    };
+  } else {
+    setGuestUser();
+  }
+  updateAuthUI();
+}
+
+function setGuestUser() {
+  APP_USER = { id: null, email: null, name: "Guest Officer", isGuest: true };
+  updateAuthUI();
+}
+
+function showAuthNotice(msg, isError) {
+  var el = $("#authNotice");
+  if (!el) return;
+  if (!msg) { el.style.display = "none"; el.textContent = ""; return; }
+  el.className = "auth-msg " + (isError ? "err" : "ok");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+function openAuthModal(mode) {
+  authMode = mode || "signin";
+  $("#tabSignIn").setAttribute("aria-selected", authMode === "signin");
+  $("#tabSignUp").setAttribute("aria-selected", authMode === "signup");
+  $("#btnAuthSubmit").textContent = authMode === "signin" ? "Sign In" : "Create Account";
+  $("#authSubtitle").textContent = CFG.supabaseUrl
+    ? "Secure station access via Supabase"
+    : "Supabase not connected. Running in demo mode.";
+  showAuthNotice("", false);
+  if (!CFG.supabaseUrl) {
+    showAuthNotice("Supabase credentials are not set in .env. You can sign in as a demo officer below or continue as guest.", false);
+  }
+  $("#authModal").hidden = false;
+  var em = $("#authEmail"); if (em) em.focus();
+}
+
+function closeAuthModal() {
+  $("#authModal").hidden = true;
+  showAuthNotice("", false);
+}
+
+function initAuth() {
+  if (CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase && window.supabase.createClient) {
+    try {
+      supabaseClient = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
+      supabaseClient.auth.getSession().then(function(res) {
+        if (res && res.data && res.data.session && res.data.session.user) {
+          setSessionUser(res.data.session.user);
+        } else {
+          setGuestUser();
+        }
+      }).catch(function(err) {
+        console.warn("[supabase] getSession error:", err);
+        setGuestUser();
+      });
+
+      supabaseClient.auth.onAuthStateChange(function(evt, session) {
+        if (session && session.user) {
+          setSessionUser(session.user);
+        } else {
+          setGuestUser();
+        }
+      });
+    } catch(e) {
+      console.warn("[supabase] Client init error:", e);
+      setGuestUser();
+    }
+  } else {
+    setGuestUser();
+  }
+}
+
+// Wire Auth DOM events
+(function setupAuthEvents(){
+  var authWrap = $("#authWrap"), authMenu = $("#authMenu");
+  $("#btnAuthOpen").onclick = function(e) {
+    e.stopPropagation();
+    if (!APP_USER.isGuest) {
+      authMenu.hidden = !authMenu.hidden;
+    } else {
+      openAuthModal("signin");
+    }
+  };
+  document.addEventListener("click", function(e) {
+    if (authMenu && !authMenu.hidden && !authWrap.contains(e.target)) {
+      authMenu.hidden = true;
+    }
+  });
+  $("#btnSignOut").onclick = async function() {
+    authMenu.hidden = true;
+    if (supabaseClient) {
+      try { await supabaseClient.auth.signOut(); } catch(e){}
+    }
+    setGuestUser();
+  };
+  $("#btnAuthClose").onclick = closeAuthModal;
+  $("#tabSignIn").onclick = function() {
+    authMode = "signin";
+    $("#tabSignIn").setAttribute("aria-selected", true);
+    $("#tabSignUp").setAttribute("aria-selected", false);
+    $("#btnAuthSubmit").textContent = "Sign In";
+    showAuthNotice("", false);
+  };
+  $("#tabSignUp").onclick = function() {
+    authMode = "signup";
+    $("#tabSignIn").setAttribute("aria-selected", false);
+    $("#tabSignUp").setAttribute("aria-selected", true);
+    $("#btnAuthSubmit").textContent = "Create Account";
+    showAuthNotice("", false);
+  };
+  $("#btnContinueGuest").onclick = function() {
+    closeAuthModal();
+    setGuestUser();
+  };
+  $("#btnGoogleAuth").onclick = async function() {
+    if (!supabaseClient) {
+      showAuthNotice("Supabase credentials not configured in .env. Enter any email above to test as demo officer.", true);
+      return;
+    }
+    showAuthNotice("Connecting to Google OAuth…", false);
+    try {
+      var res = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin }
+      });
+      if (res && res.error) showAuthNotice(res.error.message, true);
+    } catch(e) {
+      showAuthNotice(e.message || "Google sign in error.", true);
+    }
+  };
+  $("#authForm").onsubmit = async function(e) {
+    e.preventDefault();
+    var email = $("#authEmail").value.trim();
+    var password = $("#authPassword").value;
+    if (!email || !password) return;
+
+    if (!supabaseClient) {
+      APP_USER = {
+        id: "demo_" + Date.now().toString(36),
+        email: email,
+        name: email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, function(l){return l.toUpperCase()}),
+        isGuest: false
+      };
+      updateAuthUI();
+      showAuthNotice("Signed in as Demo Station Officer (" + email + ")", false);
+      setTimeout(closeAuthModal, 600);
+      return;
+    }
+
+    $("#btnAuthSubmit").disabled = true;
+    $("#btnAuthSubmit").textContent = authMode === "signin" ? "Signing In…" : "Creating Account…";
+    try {
+      if (authMode === "signin") {
+        var res = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+        if (res.error) throw res.error;
+        setSessionUser(res.data.user);
+        showAuthNotice("Signed in successfully!", false);
+        setTimeout(closeAuthModal, 600);
+      } else {
+        var res = await supabaseClient.auth.signUp({ email: email, password: password });
+        if (res.error) throw res.error;
+        if (res.data.user && !res.data.session) {
+          showAuthNotice("Account created! Check your email for a confirmation link.", false);
+        } else {
+          setSessionUser(res.data.user);
+          showAuthNotice("Account created and signed in!", false);
+          setTimeout(closeAuthModal, 600);
+        }
+      }
+    } catch(err) {
+      showAuthNotice(err.message || "Authentication failed.", true);
+    } finally {
+      $("#btnAuthSubmit").disabled = false;
+      $("#btnAuthSubmit").textContent = authMode === "signin" ? "Sign In" : "Create Account";
+    }
+  };
+})();
+
+(function loadServer(){
+  if(!window.fetch)return;
+  fetch("/api/config",{cache:"no-store"}).then(function(r){return r.ok?r.json():Promise.reject()}).then(function(c){
+    CFG.server=true;CFG.groq=!!c.groq;CFG.db=!!c.db;
+    CFG.supabaseUrl=c.supabaseUrl||"";CFG.supabaseAnonKey=c.supabaseAnonKey||"";
+    initAuth();
+    fetch("/api/validation").then(function(r){return r.ok?r.json():null}).then(function(v){if(v&&v.labels&&v.scores&&v.labels.length===v.scores.length&&v.labels.length>0){VALIDATION=v;ROC_CACHE=null;PR_CACHE=null;evRender()}}).catch(function(){});
+    fetch("/api/backtest").then(function(r){return r.ok?r.json():null}).then(function(b){if(b&&b.length&&b[0].scores&&b[0].scores.length===8){BACKTEST=b;EV.bt=0;evRender()}}).catch(function(){});
+    authenticatedFetch("/api/alerts").then(function(r){return r.ok?r.json():null}).then(function(res){
+      if(res&&res.alerts&&res.alerts.length){
+        res.alerts.forEach(function(al){if(al.acknowledged)S.acked[al.zoneId]=true});
+        if(map)renderPanel();
+      }
+    }).catch(function(){});
+    if(map)refresh();
+  }).catch(function(){
+    initAuth();
+  });
+})();
+
+/* ---------- map units: trucks, staged badges, village ripples, test fire ---------- */
+function truck(x,y,dir){
+  return '<g transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+dir+' 1)"><rect x="-11" y="-6" width="15" height="11" rx="2" fill="var(--high)" stroke="#fff" stroke-width="1.4"/><rect x="4" y="-4" width="7" height="9" rx="1.5" fill="var(--high)" stroke="#fff" stroke-width="1.4"/><rect x="6" y="-2.5" width="3.5" height="3" fill="#fff" opacity=".85"/><circle cx="-6" cy="6" r="2.4" fill="#222" stroke="#fff" stroke-width="1"/><circle cx="6" cy="6" r="2.4" fill="#222" stroke="#fff" stroke-width="1"/></g>';
+}
+function drawUnits(){
+  var svg=$("#map"),g=svg&&$(".g-units",svg);if(!g||!map)return;
+  var h="",P=map.prefix;
+  S.units.forEach(function(u){
+    var qx=(u.from.x+u.to.x)/2+(u.from.y-u.to.y)*.18,qy=(u.from.y+u.to.y)/2+(u.to.x-u.from.x)*.18;
+    if(u.status==="moving"&&u.go){
+      var t=u.e,x=(1-t)*(1-t)*u.from.x+2*(1-t)*t*qx+t*t*u.to.x,y=(1-t)*(1-t)*u.from.y+2*(1-t)*t*qy+t*t*u.to.y;
+      h+='<path d="M'+u.from.x+' '+u.from.y+'Q'+qx.toFixed(0)+' '+qy.toFixed(0)+' '+u.to.x+' '+u.to.y+'" fill="none" stroke="var(--ember)" stroke-width="2" stroke-dasharray="5 5" opacity=".65"/>';
+      h+=truck(x,y,u.to.x>=u.from.x?1:-1);
+    }else if(u.status==="ready"){
+      h+='<g transform="translate('+u.to.x.toFixed(0)+' '+u.to.y.toFixed(0)+')"><circle r="17" fill="var(--accent)" stroke="#fff" stroke-width="2.2"/><text y="5" text-anchor="middle" font-size="13" font-weight="800" fill="var(--on-accent)" font-family="Manrope,sans-serif">×'+u.t+'</text></g>';
+    }
+  });
+  if(S.notified){
+    var seen={};S.alerts.forEach(function(a){var z=zoneById(a.id),v=nearest(VILLAGES,z.cx,z.cy);if(seen[v.n])return;seen[v.n]=1;
+      for(var k=0;k<3;k++)h+='<circle class="ripple" cx="'+v.x+'" cy="'+v.y+'" r="14" style="animation-delay:'+(k*.85)+'s"/>'});
+  }
+  if(S.sim){
+    var sz=zoneById(S.sim.zid),fx=sz.cx+16,fy=sz.cy+24;
+    h+='<g transform="translate('+fx.toFixed(0)+' '+fy.toFixed(0)+')"><circle class="fire-spread" r="46" fill="url(#fire'+P+')"/><path class="flame" d="M0 -24C7 -13 15 -9 15 2A15 15 0 0 1 -15 2C-15 -4 -10 -9 -7 -15C-4 -11 -2 -9 0 -9C-2 -15 -2 -20 0 -24Z" fill="#FF765E" stroke="#E9B44C" stroke-width="1.5"/></g>';
+  }
+  g.innerHTML=h;
+}
+function animateUnits(){
+  if(S.anim)return;S.anim=true;
+  (function step(now){
+    var busy=false;
+    S.units.forEach(function(u){
+      if(u.status!=="moving")return;
+      var k=(now-u.t0)/2400;
+      if(k<0){busy=true;u.go=false;return}
+      u.go=true;
+      if(k>=1){u.status="ready";u.e=1;return}
+      busy=true;u.e=1-Math.pow(1-k,3);
+    });
+    drawUnits();
+    if(busy)requestAnimationFrame(step);
+    else{S.anim=false;S.dispatch="done";renderPanel();renderSummary()}
+  })(performance.now());
+}
+
+/* ---------- actions ---------- */
+function selectZone(id,zoom){S.selected=id;S.tab="zone";if(zoom)focusZone(id);refresh()}
+function setDay(d){S.day=d;refresh()}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function resetResponse(){S.plan=null;S.units=[];S.dispatch="idle";S.notified=false;S.sim=null}
+async function runForecast(){
+  if(S.running)return;stopPlay();
+  S.running=true;S.ran=false;S.selected=null;S.acked={};S.alerts=[];S.tab="zone";resetResponse();
+  $("#run").disabled=true;$("#run").textContent="Running…";
+  var st=$("#stages");st.innerHTML=STAGES.map(function(s,i){return '<div class="stage" data-i="'+i+'"><b>'+s.n+'</b></div>'}).join("");
+  refresh();
+  for(var i=0;i<STAGES.length;i++){
+    var e=$('.stage[data-i="'+i+'"]');e.style.setProperty("--ms",STAGES[i].ms+"ms");e.className="stage active";
+    $("#plog").textContent=STAGES[i].d+"…";
+    await sleep(reduce?120:STAGES[i].ms);e.className="stage done";
+  }
+  S.alerts=buildAlerts();S.ran=true;S.running=false;S.fresh=true;S.day=0;S.tab="alerts";persistAlerts();
+  if(map)map.sweep();
+  $("#run").disabled=false;$("#run").textContent="Re-run forecast";
+  $("#plog").textContent="Forecast ready: 24 zones × 7 days = 168 predictions. "+S.alerts.length+" zones cross the high-risk threshold. Open the Response tab to act on them.";
+  refresh();
+}
+function stopPlay(){if(S.playing){clearInterval(S.playing);S.playing=null}}
+function togglePlay(){
+  if(!S.ran)return;
+  if(S.playing){stopPlay();renderTimeline();return}
+  if(S.day>=6)S.day=0;
+  S.playing=setInterval(function(){if(S.day>=6){stopPlay();refresh();return}S.day++;refresh()},1100);
+  refresh();
+}
+function doPlan(){
+  S.plan=planResponse(S.alerts);
+  S.units=S.plan.items.filter(function(i){return i.funded}).map(function(i){var z=zoneById(i.id);return{id:i.id,t:i.t,from:{x:i.station.x,y:i.station.y},to:{x:z.cx,y:z.cy-28},status:"idle",e:0,go:false,t0:0}});
+  S.tab="response";refresh();
+}
+function doDispatch(){
+  if(!S.plan||S.dispatch!=="idle")return;
+  S.dispatch="moving";var now=performance.now();
+  S.units.forEach(function(u,i){u.status="moving";u.t0=now+(reduce?0:i*420);u.go=false;u.e=0});
+  if(reduce){S.units.forEach(function(u){u.status="ready";u.go=true;u.e=1});S.dispatch="done";refresh();return}
+  renderPanel();animateUnits();
+}
+function doNotify(){S.notified=true;S.smsFresh=true;renderPanel();drawUnits()}
+function doSim(){
+  var sel=$("#simZone"),zid=sel?sel.value:null;if(!zid)return;
+  S.sim={zid:zid,shown:false};S.selected=zid;focusZone(zid);map.update(view());renderPanel();drawUnits();
+}
+function resetSim(){S.sim=null;renderPanel();drawUnits();setVB({x:0,y:0,w:900,h:600},true)}
+
+/* zoom / pan */
+function applyVB(){$("#map").setAttribute("viewBox",vb.x.toFixed(1)+" "+vb.y.toFixed(1)+" "+vb.w.toFixed(1)+" "+vb.h.toFixed(1))}
+function setVB(t,animate){
+  t.w=Math.min(900,Math.max(260,t.w));t.h=t.w*2/3;t.x=Math.min(900-t.w,Math.max(0,t.x));t.y=Math.min(600-t.h,Math.max(0,t.y));
+  if(!animate||reduce){vb=t;applyVB();return}
+  var a={x:vb.x,y:vb.y,w:vb.w,h:vb.h},t0=performance.now();
+  (function step(now){var k=Math.min(1,(now-t0)/380),e=1-Math.pow(1-k,3);
+    vb={x:a.x+(t.x-a.x)*e,y:a.y+(t.y-a.y)*e,w:a.w+(t.w-a.w)*e,h:a.h+(t.h-a.h)*e};applyVB();if(k<1)requestAnimationFrame(step)})(t0);
+}
+function zoomBy(f){var cx=vb.x+vb.w/2,cy=vb.y+vb.h/2,w=vb.w*f;setVB({x:cx-w/2,y:cy-w/3,w:w,h:0},true)}
+function focusZone(id){var z=zoneById(id),w=420;setVB({x:z.cx-w/2,y:z.cy-w/3,w:w,h:0},true)}
+
+function initDash(){
+  if(inited)return;inited=true;
+  var svg=$("#map");map=createMap(svg,{interactive:true,prefix:"d"});
+  $("#stages").innerHTML=STAGES.map(function(s){return '<div class="stage"><b>'+s.n+'</b></div>'}).join("");
+  $("#places").innerHTML=ZONES.map(function(z){return '<option value="Zone '+z.id+'">'}).join("")+VILLAGES.map(function(v){return '<option value="'+v.n+'">'}).join("");
+
+  var drag=null,moved=false,tip=$("#tip");
+  svg.addEventListener("pointerdown",function(e){drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};moved=false});
+  window.addEventListener("pointermove",function(e){
+    if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+    if(Math.abs(dx)+Math.abs(dy)>5){moved=true;svg.classList.add("drag");tip.hidden=true}
+    if(moved){var k=vb.w/svg.clientWidth;setVB({x:drag.vx-dx*k,y:drag.vy-dy*k,w:vb.w,h:0})}
+  });
+  window.addEventListener("pointerup",function(){drag=null;svg.classList.remove("drag")});
+  svg.addEventListener("click",function(e){
+    if(moved){moved=false;return}
+    var t=e.target.closest&&e.target.closest(".zone");
+    if(t&&S.ran)selectZone(t.getAttribute("data-id"),false);
+  });
+  svg.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&S.ran&&e.target.classList.contains("zone")){e.preventDefault();selectZone(e.target.getAttribute("data-id"),false)}});
+  svg.addEventListener("mousemove",function(e){
+    var t=e.target.closest&&e.target.closest(".zone");
+    if(!t||drag&&moved){tip.hidden=true;return}
+    var id=t.getAttribute("data-id");
+    tip.textContent=S.ran?"Zone "+id+" · "+FC[id][S.day].score+" · "+sevName(FC[id][S.day].score):"Zone "+id;
+    tip.hidden=false;tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px";
+  });
+  svg.addEventListener("mouseleave",function(){tip.hidden=true});
+
+  $("#zin").onclick=function(){zoomBy(.7)};$("#zout").onclick=function(){zoomBy(1.4)};$("#zreset").onclick=function(){setVB({x:0,y:0,w:900,h:600},true)};
+  $("#run").onclick=runForecast;
+  $("#modes").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.mode=b.getAttribute("data-mode");$$("#modes button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});refresh()});
+  $("#lyPlaces").onchange=function(){S.places=this.checked;refresh()};
+  $("#lyTerrain").onchange=function(){S.terrain=this.checked;refresh()};
+  $("#timeline").addEventListener("click",function(e){
+    if(e.target.closest("#play")){togglePlay();return}
+    var b=e.target.closest(".day");if(b){stopPlay();setDay(+b.getAttribute("data-d"))}
+  });
+  $("#tabZone").onclick=function(){S.tab="zone";renderPanel()};
+  $("#tabAlerts").onclick=function(){S.tab="alerts";renderPanel()};
+  $("#tabResp").onclick=function(){S.tab="response";renderPanel()};
+  $("#tabBriefing").onclick=function(){S.tab="briefing";loadBriefingHistory();renderPanel()};
+  $("#tabAsk").onclick=function(){S.tab="ask";renderPanel()};
+  $("#panel").addEventListener("click",function(e){
+    var v=e.target.closest("[data-view]"),a=e.target.closest("[data-ack]"),c=e.target.closest("[data-act]");
+    if(e.target.closest("[data-ai]")){doAI();return}
+    if(v){stopPlay();S.day=+v.getAttribute("data-d");selectZone(v.getAttribute("data-view"),true);window.scrollTo({top:0,behavior:reduce?"auto":"smooth"})}
+    if(a){
+      var id=a.getAttribute("data-ack");
+      S.acked[id]=!S.acked[id];
+      renderPanel();
+      if(CFG.server){
+        authenticatedFetch("/api/alerts/ack",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            zoneId: id,
+            day: Number(a.getAttribute("data-day")),
+            acknowledged: S.acked[id],
+          })
+        }).catch(function(){});
+      }
+    }
+    if(c){
+      var act=c.getAttribute("data-act");
+      if(act==="plan")doPlan();
+      else if(act==="dispatch")doDispatch();
+      else if(act==="notify")doNotify();
+      else if(act==="sim")doSim();
+      else if(act==="resetsim")resetSim();
+      else if(act==="toresp"){S.tab="response";renderPanel()}
+      else if(act==="genbriefing")doBriefing();
+      else if(act==="copybriefing"){
+        if(S.briefing&&S.briefing.data)copyText(S.briefing.data.briefingText,c);
+      }
+      else if(act==="exportbriefing")exportBriefing();
+      else if(act==="askzone"){
+        var zid=c.getAttribute("data-zid");
+        S.tab="ask";renderPanel();
+        doChat("What are the primary risk factors and recommended staging actions for Zone "+zid+"?");
+      }
+    }
+    var sopInput=e.target.closest("input[data-sop]");
+    if(sopInput){
+      var cid=sopInput.getAttribute("data-sop");
+      var zid=sopInput.getAttribute("data-zid");
+      S.checklists[cid]=sopInput.checked;
+      renderPanel();
+      if(CFG.server){
+        authenticatedFetch("/api/actions",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            actionType:"checklist",
+            zoneId:zid,
+            payload:{checklistId:cid,checked:sopInput.checked},
+          })
+        }).catch(function(){});
+      }
+      return;
+    }
+    var qBtn=e.target.closest("[data-q]");
+    if(qBtn){doChat(qBtn.getAttribute("data-q"))}
+    var copyChat=e.target.closest("[data-copychat]");
+    if(copyChat){
+      var idx=+copyChat.getAttribute("data-copychat");
+      if(S.chat&&S.chat[idx])copyText(S.chat[idx].text,copyChat);
+    }
+    var vbBtn=e.target.closest("[data-viewbriefing]");
+    if(vbBtn){
+      var bid=vbBtn.getAttribute("data-viewbriefing");
+      var fnd=(S.briefingHistory||[]).filter(function(x){return String(x.id)===String(bid)})[0];
+      if(fnd){
+        S.briefing={
+          state:"ok",
+          data:{
+            title:fnd.title,
+            threatLevel:fnd.threatLevel||"high",
+            summary:fnd.summary,
+            keyRisks:[],
+            stagedRecommendations:typeof fnd.actions==="string"?JSON.parse(fnd.actions):fnd.actions||[],
+            briefingText:fnd.content
+          }
+        };
+        renderPanel();
+      }
+    }
+  });
+  $("#panel").addEventListener("submit",function(e){
+    if(e.target&&e.target.id==="chatForm"){
+      e.preventDefault();
+      var inp=$("#chatInput");
+      if(inp){var q=inp.value.trim();if(q){inp.value="";doChat(q)}}
+    }
+  });
+  $("#q").addEventListener("change",function(){
+    var q=this.value.trim().toLowerCase().replace(/^zone\s+/,"");if(!q)return;
+    var z=ZONES.filter(function(x){return x.id.toLowerCase()===q})[0],vl=VILLAGES.filter(function(x){return x.n.toLowerCase()===q})[0];
+    if(vl){var p=nearest(ZONES.map(function(x){return{x:x.cx,y:x.cy,id:x.id}}),vl.x,vl.y);z=zoneById(p.id)}
+    if(!z){$("#plog").textContent="No zone or village matches “"+this.value+"”. Try a zone like B3 or a village like Kadwa.";return}
+    if(S.ran)selectZone(z.id,true);else focusZone(z.id);
+  });
+  document.addEventListener("keydown",function(e){
+    if($("#intelligence").hidden||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+    if(e.key==="ArrowRight"&&S.day<6){stopPlay();setDay(S.day+1)}
+    if(e.key==="ArrowLeft"&&S.day>0){stopPlay();setDay(S.day-1)}
+  });
+  refresh();
+}
+
+/* ---------- router (plain #name hashes) ---------- */
+function route(){
+  var h=location.hash.replace("#","")||"home",dash=h==="intelligence";
+  $("#home").hidden=dash;$("#intelligence").hidden=!dash;
+  $$("[data-nav]").forEach(function(a){var on=a.getAttribute("data-nav")===(dash?"intelligence":(h==="how"||h==="evidence"?h:"home"));if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(dash){initDash();window.scrollTo(0,0)}
+  else{var sec=h==="how"?"sec-how":h==="evidence"?"sec-evidence":h==="data"?"sec-data":null;var el=sec&&document.getElementById(sec);
+    if(el)setTimeout(function(){el.scrollIntoView({behavior:reduce?"auto":"smooth"})},30);else window.scrollTo(0,0)}
+}
+window.addEventListener("hashchange",route);
+route();
+})();
+</script>
+</body>
+</html>

@@ -6,6 +6,8 @@ const path = require("path");
 require("./server/env").load();
 const groq = require("./server/groq");
 const db = require("./server/db");
+const csv = require("./server/csv");
+const scoring = require("./public/scoring.js");
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC = path.resolve(__dirname, "public");
@@ -25,18 +27,24 @@ const TYPES = {
 };
 
 // Per-IP rate limit for AI routes (20 requests per minute)
-const buckets = new Map();
-function allow(ip) {
-  const now = Date.now();
-  const b = (buckets.get(ip) || []).filter((t) => now - t < 60000);
-  if (b.length >= 20) {
+function makeLimiter(max) {
+  const buckets = new Map();
+  return function (ip) {
+    const now = Date.now();
+    const b = (buckets.get(ip) || []).filter((t) => now - t < 60000);
+    if (b.length >= max) {
+      buckets.set(ip, b);
+      return false;
+    }
+    b.push(now);
     buckets.set(ip, b);
-    return false;
-  }
-  b.push(now);
-  buckets.set(ip, b);
-  return true;
+    if (buckets.size > 5000) buckets.clear();
+    return true;
+  };
 }
+const allow = makeLimiter(20);
+const allowUpload = makeLimiter(Number(process.env.UPLOAD_RATE_LIMIT) || 30); // CSV validate/upload per minute per IP (default 30)
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function send(res, status, obj) {
   const h = {
@@ -133,6 +141,7 @@ async function handleApi(req, res, url) {
       groqModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
       db: db.status().mode === "postgres",
       dbMode: db.status().mode,
+      csv: { maxBytes: csv.LIMITS.maxBytes, maxRows: csv.LIMITS.maxRows },
       supabaseUrl: process.env.SUPABASE_URL || "",
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
     });
@@ -160,6 +169,74 @@ async function handleApi(req, res, url) {
       return send(res, 429, { error: "Too many requests. Wait a minute and try again." });
     const body = await readBody(req, 15 * 1024);
     return send(res, 200, await groq.chat(body));
+  }
+
+  // ---- CSV observation datasets -------------------------------------------------
+  if (p === "/api/datasets/schema" && req.method === "GET") {
+    return send(res, 200, {
+      columns: scoring.OBS_COLUMNS, zoneIds: scoring.ZONE_IDS, limits: csv.LIMITS,
+      engine: { version: scoring.ENGINE_VERSION, weights: scoring.WEIGHTS, thresholds: { high: scoring.THRESH_HIGH, med: scoring.THRESH_MED }, normalisation: scoring.NORMALISATION },
+      rules: ["One row per zone per date (final observed values; no demo offsets are added).", "Every zone A1 to D6 must appear for every date.", "1 to 7 consecutive dates.", "No missing, non-numeric, out-of-range or duplicate values."],
+    });
+  }
+  if (p === "/api/datasets/validate" && req.method === "POST") {
+    if (!allowUpload(req.socket.remoteAddress || "local")) return send(res, 429, { error: "Too many uploads. Wait a minute and try again." });
+    const body = await readBody(req, csv.LIMITS.maxBytes * 2 + 4096);
+    const v = csv.validateCsv(body && body.csv);
+    if (!v.ok) return send(res, 200, { ok: false, errors: v.errors, totalErrors: v.totalErrors, warnings: v.warnings });
+    return send(res, 200, {
+      ok: true, errors: [], totalErrors: 0, warnings: v.warnings, summary: v.summary, dates: v.dates,
+      name: csv.cleanDatasetName(body.filename), preview: csv.publicRows(v.rows).slice(0, 12),
+    });
+  }
+  if (p === "/api/datasets" && req.method === "POST") {
+    if (!allowUpload(req.socket.remoteAddress || "local")) return send(res, 429, { error: "Too many uploads. Wait a minute and try again." });
+    // A present Authorization header must be valid (never silently downgrade a signed-in user to guest).
+    const user = req.headers.authorization ? await requireUser(req) : null;
+    const body = await readBody(req, csv.LIMITS.maxBytes * 2 + 4096);
+    const v = csv.validateCsv(body && body.csv);
+    if (!v.ok) return send(res, 422, { ok: false, error: "The CSV did not pass validation.", errors: v.errors, totalErrors: v.totalErrors });
+    const forecast = csv.buildForecast(v.rows, v.dates);
+    const name = csv.cleanDatasetName(body.filename);
+    let saved = null;
+    if (user) saved = await db.saveDataset(user, { name, filename: name, sha256: csv.sha256(body.csv), rows: v.rows, dates: v.dates, forecast });
+    const scores = {};
+    Object.keys(forecast.byZone).forEach((z) => { scores[z] = forecast.byZone[z].map((f) => f.score); });
+    return send(res, 200, {
+      ok: true,
+      dataset: { id: saved ? saved.id : null, saved: !!saved, name, source: "user-upload", uploadedAt: saved ? saved.uploadedAt : new Date().toISOString(), rowCount: v.rows.length, dates: v.dates, dateStart: v.dates[0], dateEnd: v.dates[v.dates.length - 1], sha256: csv.sha256(body.csv) },
+      observations: csv.publicRows(v.rows),
+      forecast: { engine: forecast.engine, scores, perDay: forecast.perDay, highZoneCount: forecast.highZoneCount, dates: v.dates },
+      note: saved ? "Dataset saved to your account." : "Guest session: this dataset is used for this session only and is not saved. Sign in to keep it.",
+    });
+  }
+  if (p === "/api/datasets" && req.method === "GET") {
+    const user = await requireUser(req);
+    return send(res, 200, { datasets: await db.listDatasets(user.id) });
+  }
+  {
+    const m = p.match(/^\/api\/datasets\/([^/]+)$/);
+    if (m && (req.method === "GET" || req.method === "DELETE")) {
+      const user = await requireUser(req);
+      if (!UUID_RE.test(m[1])) return send(res, 404, { error: "Dataset not found." });
+      if (req.method === "DELETE") {
+        return (await db.deleteDataset(user.id, m[1])) ? send(res, 200, { deleted: true }) : send(res, 404, { error: "Dataset not found." });
+      }
+      const got = await db.getDataset(user.id, m[1]);
+      if (!got) return send(res, 404, { error: "Dataset not found." }); // same answer for "missing" and "someone else's"
+      const rows = got.rows.map((r) => ({ zone_id: r.zone_id, date: r.date, temp_c: +r.temp_c, humidity_pct: +r.humidity_pct, wind_kmh: +r.wind_kmh, ndvi: +r.ndvi, fire_history: +r.fire_history }));
+      const dates = Array.from(new Set(rows.map((r) => r.date))).sort();
+      const forecast = csv.buildForecast(rows, dates);
+      const scores = {};
+      Object.keys(forecast.byZone).forEach((z) => { scores[z] = forecast.byZone[z].map((f) => f.score); });
+      return send(res, 200, {
+        ok: true,
+        dataset: Object.assign({ saved: true, source: "user-upload", dates }, got.meta),
+        observations: rows,
+        forecast: { engine: forecast.engine, scores, perDay: forecast.perDay, highZoneCount: forecast.highZoneCount, dates },
+        storedRun: got.run, storedScoresMatch: got.scores ? JSON.stringify(got.scores) === JSON.stringify(scores) : null,
+      });
+    }
   }
 
   // Alerts persistence

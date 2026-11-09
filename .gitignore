@@ -15,3 +15,6 @@ node_modules/
 
 # Vercel
 .vercel/
+# Python bytecode from the optional browser tests
+__pycache__/
+*.pyc
