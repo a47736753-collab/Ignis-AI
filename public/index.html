@@ -562,6 +562,85 @@ input[type=range]{accent-color:var(--accent)}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+
+/* ===== IGNIS AI upgrade: data source bar, CSV upload, toast, auth screen ===== */
+.pill.usr{background:rgba(98,182,203,.16);color:#A7E0EE;border-color:rgba(98,182,203,.45)}
+.pill.na{background:var(--surface2);color:var(--muted);border-style:dashed}
+.dsbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.dsinfo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;flex:1 1 320px}
+.dstext{font-size:13px;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.dstext b{color:var(--ink)}
+.dsbtns{display:flex;gap:8px;flex-wrap:wrap}
+.dspanel{margin:0 0 14px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.dsgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.drop{display:grid;place-items:center;text-align:center;gap:4px;padding:26px 14px;border:2px dashed var(--line);border-radius:12px;background:var(--surface2);cursor:pointer;transition:border-color .15s,background .15s;color:var(--muted);font-size:13px}
+.drop b{color:var(--ink);font-size:15px}
+.drop u{color:var(--accent)}
+.drop:hover,.drop:focus-visible,.drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface2));outline:none}
+.dstpl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dsprog{position:relative;margin-top:10px;height:22px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;font-size:12px}
+.dsprog i{position:absolute;inset:0 auto 0 0;width:0;background:color-mix(in srgb,var(--accent) 45%,transparent);transition:width .2s}
+.dsprog span{position:relative;display:block;padding:3px 10px;color:var(--ink)}
+.dsfmt{font-size:12.5px;color:var(--muted)}
+.dsfmt summary{cursor:pointer;color:var(--ink);font-weight:700;font-size:13px}
+.dsfmt table{width:100%;border-collapse:collapse;margin-top:8px}
+.dsfmt th{font-size:11px;text-align:left;padding:4px 6px;color:var(--muted)}
+.dsfmt td{padding:4px 6px;border-top:1px solid var(--line);vertical-align:top}
+.dsfmt code{font-size:12px;color:var(--accent)}
+.dsfmt ul{margin:8px 0 0 18px;display:grid;gap:3px}
+.dserr{margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(255,118,94,.12);border:1px solid rgba(255,118,94,.4);color:#FFB4A6;font-size:13px}
+.dserr ul{margin:8px 0 0 18px;display:grid;gap:4px;max-height:220px;overflow:auto}
+.dserr code{color:#fff}
+.dsok{margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(85,184,138,.12);border:1px solid rgba(85,184,138,.4);color:#BFE8D2;font-size:13px}
+.dswarn{margin-top:8px;font-size:12.5px;color:var(--med)}
+.dsprev{margin-top:10px;overflow:auto;max-height:260px;border:1px solid var(--line);border-radius:10px}
+.dsprev table{width:100%;border-collapse:collapse;font-size:12.5px}
+.dsprev th{position:sticky;top:0;background:var(--surface2);text-align:left;padding:6px 8px;font-size:11px;color:var(--muted)}
+.dsprev td{padding:5px 8px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.dsact{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.dsact .act:disabled{opacity:.6;cursor:wait}
+.dssaved{margin-top:14px;font-size:13px}
+.dssaved h4{font-size:13px;margin-bottom:6px}
+.dsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-top:6px;background:var(--surface2)}
+.dsrow small{display:block;color:var(--muted);font-size:11.5px}
+.dsrow div:last-child{display:flex;gap:6px;flex:none}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:200;max-width:min(92vw,520px);padding:11px 16px;border-radius:12px;background:var(--surface2);border:1px solid var(--accent);color:var(--ink);font-size:14px;box-shadow:var(--shadow);transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:760px){.dsgrid{grid-template-columns:1fr}}
+/* methodology + labels */
+.mgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:20px}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.mcard h3{font-size:18px;margin-bottom:10px}
+.mcard p,.mcard li{font-size:14.5px;color:var(--muted)}
+.mcard ol,.mcard ul{margin:8px 0 0 20px;display:grid;gap:6px}
+.mcard code,.mformula{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--accent)}
+.mformula{display:block;margin:10px 0;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);overflow:auto;white-space:pre-wrap}
+.mtab{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+.mtab th{font-size:11.5px;text-align:left;padding:6px;color:var(--muted)}
+.mtab td{padding:7px 6px;border-top:1px solid var(--line);vertical-align:top}
+.dlegend{display:grid;gap:8px;margin-top:10px}
+.dlegend>div{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted)}
+.dlegend .pill{flex:none;min-width:150px;text-align:center}
+.cs-steps{counter-reset:cs;display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.cs-steps li{counter-increment:cs;display:flex;gap:10px;font-size:14px;color:var(--muted)}
+.cs-steps li::before{content:counter(cs);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--surface2);border:1px solid var(--line);color:var(--ink)}
+.synth-wm{margin:0 0 10px;padding:8px 12px;border-radius:8px;border:1px dashed rgba(255,118,94,.55);background:rgba(255,118,94,.08);color:#FFB4A6;font-size:12.5px}
+.nv{font-family:Sora,Manrope,system-ui,sans-serif;font-size:20px;font-weight:700;color:var(--muted)}
+@media (max-width:860px){.mgrid{grid-template-columns:1fr}}
+/* dedicated authentication screen */
+#authModal.auth-screen{background:radial-gradient(900px 500px at 70% -10%,rgba(98,182,203,.18),transparent 60%),var(--bg);backdrop-filter:none;align-items:center;overflow:auto}
+#authModal.auth-screen .modal-card{max-width:440px;padding:30px 28px;border-radius:20px}
+.auth-brand{display:flex;align-items:center;gap:10px;font-family:Sora,Manrope,system-ui,sans-serif;font-weight:800;font-size:18px;letter-spacing:.02em;margin-bottom:14px;color:#fff}
+.auth-tag{font-size:13px;color:var(--muted);margin:8px 0 14px}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:64px}
+.pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--accent);font-size:12px;font-weight:700;padding:6px 8px;cursor:pointer;border-radius:6px}
+.pw-toggle:hover{background:var(--surface)}
+.ferr{display:block;min-height:0;font-size:12px;color:#FFA190;margin-top:5px}
+.form-grp input[aria-invalid="true"]{border-color:#FF765E}
+.btn.primary .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(8,32,42,.35);border-top-color:#08202A;border-radius:50%;animation:spinr .7s linear infinite}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.auth-note-demo{font-size:12px;color:var(--med);margin-top:10px}
 </style>
 </head>
 <body>
@@ -613,6 +692,7 @@ input[type=range]{accent-color:var(--accent)}
           <div class="cta">
             <a class="btn primary" href="#intelligence">Explore Intelligence</a>
             <a class="btn ghost" href="#how">Discover how it works</a>
+            <button type="button" class="btn ghost" id="heroStart">Sign in / Get started</button>
           </div>
         </div>
         <div class="hero-map" aria-label="Animated preview of a seven-day risk forecast">
@@ -625,11 +705,11 @@ input[type=range]{accent-color:var(--accent)}
       </div>
       <div class="ticker" aria-label="Simulated alert feed"><div class="lab"><i></i>Simulated alerts</div><div class="track" id="track"></div></div>
       <div class="stats" id="stats">
-        <div><div class="n" data-count="3.7" data-dec="1" data-suf="M km²">0</div><p>Land burned worldwide in the 2024–25 fire season, an area larger than India.</p></div>
-        <div><div class="n" data-count="140" data-pre="$" data-suf="B+">0</div><p>Estimated damage from the 2025 Eaton and Palisades fires, which forced 150,000+ evacuations.</p></div>
-        <div><div class="n" data-count="9" data-suf="%">0</div><p>Rise in wildfire carbon emissions in 2024–25 against the historical average.</p></div>
+        <div><div class="n" data-count="3.7" data-dec="1" data-suf="M km²">3.7M km²</div><p>Land burned worldwide in the 2024–25 fire season, an area larger than India. Burned area was actually below the long-term average that season.</p></div>
+        <div><div class="n">$135–150B</div><p>AccuWeather’s preliminary estimate (Jan 2025) of damage and economic loss from the Eaton and Palisades fires, with about 150,000 people under evacuation orders. A private-firm estimate, not an official figure, and later revised upward.</p></div>
+        <div><div class="n" data-count="9" data-suf="%">9%</div><p>Wildfire carbon emissions in the 2024–25 season ran above the long-term average, the 6th highest since 2003.</p></div>
       </div>
-      <p class="srcnote">Source: State of Wildfires 2024–25 report (Earth System Science Data, 2025), as cited in our team deck.</p>
+      <p class="srcnote">Context figures from outside sources, not results of IGNIS AI: State of Wildfires 2024–25 (Earth System Science Data, 2025) and AccuWeather’s January 2025 preliminary estimate. IGNIS AI’s own accuracy and impact: <b>Not yet validated</b>.</p>
     </div>
   </section>
 
@@ -663,20 +743,69 @@ input[type=range]{accent-color:var(--accent)}
         <span><i class="sw" style="background:var(--med)"></i>Medium risk, 40 to 64</span>
         <span><i class="sw" style="background:var(--high)"></i>High risk, 65 and above, raises an alert</span>
       </div>
-      <div class="note"><b>What does what.</b> The trained machine-learning model produces every risk score. A language-model layer (Groq, planned) will only turn those scores into plain-language explanations. It never invents a prediction.</div>
+      <div class="note"><b>What does what.</b> Every risk score comes from a deterministic weighted formula (see “How the risk score is calculated” below). It is not a trained machine-learning model. Groq, a language model, is connected on the server and only explains those scores in plain language. It never sets or changes a score.</div>
+    </div>
+  </section>
+
+  <section class="s t-sky" id="sec-method">
+    <div class="wrap">
+      <h2>How the risk score is calculated.</h2>
+      <p class="intro">A fixed, inspectable formula, not a trained model. The same code scores the demo data and any CSV you upload. <span id="methodSource"></span></p>
+      <div class="mgrid">
+        <div class="mcard">
+          <h3>Inputs and weights</h3>
+          <div id="methodTable"></div>
+          <h3 style="margin-top:18px">Calculation</h3>
+          <ol>
+            <li>Each input is turned into a 0 to 1 danger value using the band in the table.</li>
+            <li>The five values are combined as a weighted sum. The weights add up to 100%.</li>
+            <li>The sum is rescaled to 0 to 100 and rounded, giving the risk score.</li>
+            <li>The score maps to low, medium or high risk. High risk raises an alert.</li>
+          </ol>
+          <code class="mformula" id="methodFormula"></code>
+          <h3 style="margin-top:18px">Worked example</h3>
+          <div id="methodExample"></div>
+        </div>
+        <div>
+          <div class="mcard">
+            <h3>What Groq AI does (and does not do)</h3>
+            <ul>
+              <li>The deterministic engine produces every risk score. Groq never sets, changes or double-checks a score.</li>
+              <li>Groq reads the current forecast and alert information the app sends it, then writes zone explanations, executive briefings and answers to operational questions.</li>
+              <li>Each request carries the forecast numbers and the active data source (demonstration or uploaded). The prompts forbid inventing data, fires or accuracy figures.</li>
+              <li>The API key stays on the server. If Groq is unavailable you see an error message and the forecast keeps working.</li>
+            </ul>
+            <div id="methodGroqStatus" style="margin-top:10px"></div>
+          </div>
+          <div class="mcard" style="margin-top:16px">
+            <h3>What kind of data is behind a number?</h3>
+            <div class="dlegend" id="dataLegend"></div>
+          </div>
+        </div>
+      </div>
+      <div class="mcard" style="margin-top:16px">
+        <h3>Limitations</h3>
+        <ul>
+          <li><b>Data quality and coverage.</b> A score is only as good as its inputs. The 24-zone grid is illustrative, and gaps or sensor errors in your data carry straight into the score.</li>
+          <li><b>Weather forecast uncertainty.</b> Forecasts lose accuracy toward Day 7, and so do the scores built on them.</li>
+          <li><b>Satellite revisits.</b> Sentinel-2 passes over a location about every 5 days, and cloud can delay it, so vegetation dryness can be several days old.</li>
+          <li><b>Risk is not detection.</b> A high score means conditions favour fire. It does not mean a fire has started, and fires started by people are hard to predict from environmental data.</li>
+          <li><b>Local validation is required.</b> The weights are expert-set and have not been tested against real outcomes. Validate locally before any operational use.</li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <section class="s t-peach" id="sec-data">
     <div class="wrap">
       <h2>Built on open earth-observation data.</h2>
-      <p class="intro">Every input has a named source and a type, so judges can tell observations from forecasts from model output.</p>
+      <p class="intro">These are the open data sources IGNIS AI is designed around, each with a named type. In this prototype none of them is connected live: the demo uses synthetic values, and you can upload your own observations as a CSV.</p>
       <div class="rows">
-        <div><span class="pill obs">Observed</span><h3>NASA FIRMS</h3><p>Historical fire detections that show recurring hotspots and seasonal patterns.</p><a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">firms.modaps.eosdis.nasa.gov</a></div>
-        <div><span class="pill obs">Observed</span><h3>Copernicus Sentinel-2</h3><p>Satellite imagery used to compute NDVI, a measure of how green or dry vegetation is.</p><a href="https://dataspace.copernicus.eu/" target="_blank" rel="noopener">dataspace.copernicus.eu</a></div>
-        <div><span class="pill fc">Forecast</span><h3>Open-Meteo</h3><p>Temperature, humidity and wind speed forecasts for the next seven days.</p><a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a></div>
-        <div><span class="pill obs">Observed</span><h3>Copernicus ERA5</h3><p>Climate reanalysis used for long-run weather context when training the model.</p><a href="https://cds.climate.copernicus.eu/" target="_blank" rel="noopener">cds.climate.copernicus.eu</a></div>
-        <div style="border-bottom:1px solid var(--line)"><span class="pill ill">Illustrative</span><h3>This demo</h3><p>Zones, weather values and scores on this site are generated deterministically, so the same click always gives the same result.</p><span></span></div>
+        <div><span class="pill obs">Observed · planned feed</span><h3>NASA FIRMS</h3><p>Historical fire detections that show recurring hotspots and seasonal patterns.</p><a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">firms.modaps.eosdis.nasa.gov</a></div>
+        <div><span class="pill obs">Observed · planned feed</span><h3>Copernicus Sentinel-2</h3><p>Satellite imagery used to compute NDVI, a measure of how green or dry vegetation is.</p><a href="https://dataspace.copernicus.eu/" target="_blank" rel="noopener">dataspace.copernicus.eu</a></div>
+        <div><span class="pill fc">Forecast · planned feed</span><h3>Open-Meteo</h3><p>Temperature, humidity and wind speed forecasts for the next seven days.</p><a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a></div>
+        <div><span class="pill obs">Observed · planned feed</span><h3>Copernicus ERA5</h3><p>Climate reanalysis intended for long-run weather context when checking and validating the scoring weights.</p><a href="https://cds.climate.copernicus.eu/" target="_blank" rel="noopener">cds.climate.copernicus.eu</a></div>
+        <div style="border-bottom:1px solid var(--line)"><span class="pill ill">Illustrative</span><h3>This demo</h3><p>Zones, weather values and scores on this site are generated deterministically, so the same click always gives the same result. Upload a CSV to replace them with your own observations.</p><span></span></div>
       </div>
     </div>
   </section>
@@ -686,7 +815,7 @@ input[type=range]{accent-color:var(--accent)}
       <h2>Does it work? The evidence.</h2>
       <p class="intro">Four views of how we judge the system: how accurate the scores are, whether it warns early enough on past fires, what that is worth to a fire station, and where it falls short.</p>
       <div class="evtabs" id="evTabs" role="tablist" aria-label="Evidence views">
-        <button type="button" role="tab" data-evtab="perf">Model accuracy</button>
+        <button type="button" role="tab" data-evtab="perf">Score accuracy</button>
         <button type="button" role="tab" data-evtab="back">Backtest replay</button>
         <button type="button" role="tab" data-evtab="impact">Impact</button>
         <button type="button" role="tab" data-evtab="limits">Limits and next steps</button>
@@ -719,6 +848,24 @@ input[type=range]{accent-color:var(--accent)}
         <label class="chk"><input type="checkbox" id="lyPlaces" checked> Roads and villages</label>
         <label class="chk"><input type="checkbox" id="lyTerrain" checked> Terrain lines</label>
         <div class="search"><input id="q" list="places" placeholder="Search a zone or village" aria-label="Search a zone or village" autocomplete="off"><datalist id="places"></datalist></div>
+      </div>
+
+      <div class="dsbar" id="dsbar">
+        <div class="dsinfo"><span class="pill ill" id="dsPill">Demonstration data (synthetic)</span><span class="dstext" id="dsText"></span></div>
+        <div class="dsbtns"><button type="button" class="chipbtn" id="dsToggle" aria-expanded="false" aria-controls="dspanel">Upload CSV data</button><button type="button" class="chipbtn" id="dsDemo" hidden>Use demo data</button></div>
+      </div>
+      <div class="dspanel" id="dspanel" hidden>
+        <div class="dsgrid">
+          <div>
+            <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a CSV file or drop one here"><b>Drop a CSV file here</b><span>or <u>browse files</u> &middot; .csv, up to <span id="dsMax">200 KB</span></span></div>
+            <input type="file" id="dsFile" accept=".csv,text/csv" hidden>
+            <div class="dsprog" id="dsProg" hidden role="status"><i></i><span id="dsProgText"></span></div>
+            <div class="dstpl"><button type="button" class="chipbtn" id="tplBlank">Download blank template</button><button type="button" class="chipbtn" id="tplDemo">Download example (synthetic demo values)</button></div>
+          </div>
+          <details class="dsfmt" id="dsFmt" open><summary>Required CSV format</summary><div id="dsFmtBody"></div></details>
+        </div>
+        <div id="dsResult" aria-live="polite"></div>
+        <div class="dssaved" id="dsSaved"></div>
       </div>
 
       <div class="pipeline">
@@ -758,27 +905,34 @@ input[type=range]{accent-color:var(--accent)}
 <div class="tip" id="tip" hidden></div>
 
 <!-- ============ AUTH MODAL ============ -->
-<div class="modal-backdrop" id="authModal" hidden>
+<div class="modal-backdrop auth-screen" id="authModal" hidden>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <button type="button" class="modal-close" id="btnAuthClose" aria-label="Close modal">&times;</button>
-    <h3 id="authTitle" style="font-size:22px;color:#fff">Station Authentication</h3>
-    <p class="fine" style="margin-top:4px" id="authSubtitle">Secure officer access via Supabase</p>
+    <div class="auth-brand">IGNIS AI</div>
+    <h3 id="authTitle" style="font-size:22px;color:#fff">Sign in to IGNIS AI</h3>
+    <p class="auth-tag" id="authSubtitle">Sign in to save datasets, alerts and briefings to your account. Guests keep full access to the demo.</p>
 
     <div class="modal-tabs" role="tablist">
       <button type="button" id="tabSignIn" aria-selected="true">Sign In</button>
       <button type="button" id="tabSignUp" aria-selected="false">Create Account</button>
     </div>
 
-    <div id="authNotice" class="auth-msg"></div>
+    <div id="authNotice" class="auth-msg" role="status" aria-live="polite"></div>
 
-    <form id="authForm">
+    <form id="authForm" novalidate>
       <div class="form-grp">
-        <label for="authEmail">Officer Email</label>
-        <input type="email" id="authEmail" required placeholder="officer@station.gov" autocomplete="email">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" placeholder="officer@station.gov" autocomplete="email" inputmode="email">
+        <small class="ferr" id="authEmailErr" role="alert"></small>
       </div>
       <div class="form-grp">
         <label for="authPassword">Password</label>
-        <input type="password" id="authPassword" required placeholder="••••••••" autocomplete="current-password" minlength="6">
+        <div class="pw-wrap">
+          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="pw-toggle" id="pwToggle" aria-pressed="false" aria-label="Show password">Show</button>
+        </div>
+        <small class="fine" id="authPwHint" style="display:block;margin-top:4px"></small>
+        <small class="ferr" id="authPasswordErr" role="alert"></small>
       </div>
       <button type="submit" class="btn primary" id="btnAuthSubmit" style="width:100%;justify-content:center;margin-top:8px">Sign In</button>
     </form>
@@ -797,6 +951,8 @@ input[type=range]{accent-color:var(--accent)}
 </div>
 
 <!-- ============ DATA LAYER (pure, swappable for the real model and database) ============ -->
+<script src="/scoring.js"></script>
+<script src="/metrics.js"></script>
 <script id="data">
 /* To show real results on the Evidence section, set VALIDATION = {labels:[0/1,...], scores:[0..100,...]} from your held-out set,
    and BACKTEST = [{name, zone, scores:[8 daily scores from D-7 to D0], note}]. While null, clearly labelled sample data is shown. */
@@ -804,10 +960,10 @@ var VALIDATION = null;
 var BACKTEST = null;
 
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function clamp(x,a,b){a=a===undefined?0:a;b=b===undefined?1:b;return Math.min(b,Math.max(a,x))}
+var clamp=IgnisScoring.clamp; /* shared engine: public/scoring.js */
 
-var MW=900, MH=600, COLS=6, ROWS=4, THRESH_HIGH=65, THRESH_MED=40, KM_PER_UNIT=0.04;
-var W={temp:.24,hum:.26,wind:.12,ndvi:.22,hist:.16};
+var MW=900, MH=600, COLS=6, ROWS=4, THRESH_HIGH=IgnisScoring.THRESH_HIGH, THRESH_MED=IgnisScoring.THRESH_MED, KM_PER_UNIT=0.04;
+var W=IgnisScoring.WEIGHTS;
 var DAY_TEMP=[0,1.5,3,5,6.5,4.5,2], DAY_HUM=[0,-3,-7,-11,-14,-9,-4], DAY_WIND=[0,1,3,4,6,3,1];
 var VILLAGES=[{n:"Kadwa",x:170,y:140},{n:"Ranjani",x:470,y:300},{n:"Sitapur",x:720,y:130},{n:"Mohgaon",x:290,y:470},{n:"Bhilwadi",x:790,y:480}];
 var STATIONS=[{n:"Station 1, Sitapur",x:650,y:215},{n:"Station 2, Mohgaon",x:560,y:520}];
@@ -841,14 +997,7 @@ function buildZones(){
 var ZONES=buildZones();
 function zoneById(id){return ZONES.filter(function(z){return z.id===id})[0]}
 
-function scoreFrom(t,h,w,ndvi,hist){
-  var N={ temp:clamp((t-22)/22), hum:clamp(1-(h-10)/70), wind:clamp(w/40), ndvi:clamp(1-(ndvi-.2)/.6), hist:hist };
-  var c={}, s=0, k;
-  for(k in W){c[k]=W[k]*N[k]; s+=c[k]}
-  var stretch=clamp((s-.26)/.55)*100, scale=s>0?stretch/s:0;
-  for(k in c){c[k]=c[k]*scale}
-  return { score:Math.round(stretch), N:N, contrib:c };
-}
+var scoreFrom=IgnisScoring.scoreFrom;
 function scoreZone(z,d){
   var t=z.base.temp+DAY_TEMP[d], h=clamp(z.base.hum+DAY_HUM[d],12,90), w=z.base.wind+DAY_WIND[d];
   var r=scoreFrom(t,h,w,z.base.ndvi,z.base.hist);
@@ -856,12 +1005,14 @@ function scoreZone(z,d){
 }
 var FC={};
 ZONES.forEach(function(z){FC[z.id]=[];for(var d=0;d<7;d++)FC[z.id].push(scoreZone(z,d))});
+var DATA={source:"demo",name:"Demonstration data",dates:null,uploadedAt:null,id:null,saved:false,ownerId:null,rowCount:null}; /* active data source; see CSV upload section */
+var DEMO_FC=FC, NDAYS=7; /* FC is swapped for uploaded observations; DEMO_FC always holds the synthetic demo forecast */
 
 function nearest(list,x,y){var b=null,bd=1e9;list.forEach(function(p){var d=Math.hypot(p.x-x,p.y-y);if(d<bd){bd=d;b=p}});return b}
 function dayCounts(d){var o={high:0,med:0,low:0};ZONES.forEach(function(z){o[sev(FC[z.id][d].score)]++});return o}
 function buildAlerts(){
   var out=[];
-  ZONES.forEach(function(z){for(var d=0;d<7;d++){if(FC[z.id][d].score>=THRESH_HIGH){out.push({id:z.id,day:d,score:FC[z.id][d].score});break}}});
+  ZONES.forEach(function(z){for(var d=0;d<NDAYS;d++){if(FC[z.id][d].score>=THRESH_HIGH){out.push({id:z.id,day:d,score:FC[z.id][d].score});break}}});
   out.sort(function(a,b){return a.day-b.day||b.score-a.score});
   return out;
 }
@@ -893,9 +1044,9 @@ var SAMPLE_BACKTEST=[
   {name:"Sample fire B",zone:"Zone C6",scores:[28,31,40,52,61,68,75,80],note:"The score crossed the threshold two days before ignition."},
   {name:"Sample fire C (missed)",zone:"Zone B2",scores:[41,43,45,49,53,58,60,63],note:"The score stayed just under the threshold, so no alert was raised. Misses like this are why we also report recall."}
 ];
-function confusion(v,th){var tp=0,fp=0,tn=0,fn=0,i;for(i=0;i<v.labels.length;i++){var pos=v.scores[i]>=th;if(v.labels[i]){if(pos)tp++;else fn++}else{if(pos)fp++;else tn++}}return{tp:tp,fp:fp,tn:tn,fn:fn}}
-function rocPoints(v){var pts=[],t,auc=0,prev=null;for(t=101;t>=0;t--){var c=confusion(v,t),p={x:c.fp/Math.max(1,c.fp+c.tn),y:c.tp/Math.max(1,c.tp+c.fn)};if(prev)auc+=(p.x-prev.x)*(p.y+prev.y)/2;pts.push(p);prev=p}return{pts:pts,auc:auc}}
-function prPoints(v){var pts=[],t,auc=0,prev=null,posTotal=0;for(var i=0;i<v.labels.length;i++){if(v.labels[i])posTotal++}var base=posTotal/Math.max(1,v.labels.length);for(t=101;t>=0;t--){var c=confusion(v,t),rec=c.tp/Math.max(1,c.tp+c.fn),prec=(c.tp+c.fp)>0?(c.tp/(c.tp+c.fp)):1,p={x:rec,y:prec};if(prev&&p.x>prev.x)auc+=(p.x-prev.x)*((p.y+prev.y)/2);pts.push(p);prev=p}return{pts:pts,auc:auc,baseline:base}}
+function confusion(v,th){return IgnisMetrics.confusionAt(v.labels,v.scores,th)}
+function rocPoints(v){var r=IgnisMetrics.rocCurve(v.labels,v.scores);return{pts:r.pts,auc:r.auc}}
+function prPoints(v){var r=IgnisMetrics.prCurve(v.labels,v.scores);return{pts:r.pts,ap:r.ap,auc:r.aucTrapz,baseline:r.baseline}}
 </script>
 
 <!-- ============ APP ============ -->
@@ -906,7 +1057,7 @@ var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelect
 var NS="http://www.w3.org/2000/svg";
 var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function dateFor(d){var t=new Date();t.setDate(t.getDate()+d+1);return t}
+function dateFor(d,demo){if(!demo&&DATA.dates&&DATA.dates[d]){var p=DATA.dates[d].split("-");return new Date(+p[0],+p[1]-1,+p[2])}var t=new Date();t.setDate(t.getDate()+d+1);return t}
 function dayLabel(d){return dateFor(d).toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}
 
 /* ---------- reusable map ---------- */
@@ -916,7 +1067,7 @@ function rngPath(rnd,cx,cy,r,n){
 }
 function zoneStyle(z,v){
   if(!v.ran) return {fill:"var(--ink)",fo:.03,stroke:"var(--ink)",so:.45};
-  var f=FC[z.id][v.day],h;
+  var f=(v.demo?DEMO_FC:FC)[z.id][v.day],h;
   if(v.mode==="ndvi"){h=40+clamp((f.ndvi-.3)/.5)*100;return{fill:"hsl("+h+" 65% 55%)",fo:.5,stroke:"hsl("+h+" 65% 50%)",so:1}}
   if(v.mode==="hum"){h=20+clamp((f.hum-12)/70)*180;return{fill:"hsl("+h+" 72% 58%)",fo:.5,stroke:"hsl("+h+" 72% 52%)",so:1}}
   var s=sev(f.score),col=s==="high"?"var(--high)":s==="med"?"var(--med)":"var(--low)";
@@ -959,7 +1110,7 @@ function createMap(svg,opt){
   var api={zEls:zEls,prefix:P};
   api.update=function(v){
     ZONES.forEach(function(z){
-      var s=zoneStyle(z,v),e=zEls[z.id],f=FC[z.id][v.day],hp=hEls[z.id];
+      var s=zoneStyle(z,v),e=zEls[z.id],f=(v.demo?DEMO_FC:FC)[z.id][v.day],hp=hEls[z.id];
       e.style.fill=s.fill;e.style.fillOpacity=s.fo;e.style.stroke=s.stroke;e.style.strokeOpacity=s.so;
       if(v.ran&&v.mode==="risk"&&f.score>=THRESH_MED){hp.style.fill=sev(f.score)==="high"?"var(--high)":"var(--med)";hp.style.fillOpacity=(((f.score-35)/70)*.55).toFixed(2)}
       else hp.style.fillOpacity=0;
@@ -984,8 +1135,8 @@ var hero=createMap($("#heroMap"),{interactive:false,labels:false,prefix:"h"});
 var hd=0,dots=$("#heroDots");
 for(var di=0;di<7;di++){var dd=document.createElement("i");dots.appendChild(dd)}
 function heroTick(){
-  hero.update({ran:true,mode:"risk",day:hd,selected:null});
-  $("#heroDay").textContent="Day "+(hd+1)+" · "+dateFor(hd).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+  hero.update({ran:true,mode:"risk",day:hd,selected:null,demo:true}); /* the landing preview is always the synthetic demo forecast */
+  $("#heroDay").textContent="Day "+(hd+1)+" · "+dateFor(hd,true).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
   $$("i",dots).forEach(function(e,i){e.className=i===hd?"on":""});
   hd=(hd+1)%7;
 }
@@ -1053,14 +1204,9 @@ function roundTree(x,y,h){var rx=h*.26,ry=h*.32,cy=y-h*.6,f=function(n){return n
 })();
 
 (function counters(){
-  var els=$$("[data-count]");
-  function fmt(e,v){var d=+e.getAttribute("data-dec")||0;e.textContent=(e.getAttribute("data-pre")||"")+v.toFixed(d)+(e.getAttribute("data-suf")||"")}
-  els.forEach(function(e){fmt(e,+e.getAttribute("data-count"))});
-  if(reduce||!("IntersectionObserver" in window))return;
-  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(!x.isIntersecting)return;io.unobserve(x.target);
-    var e=x.target,end=+e.getAttribute("data-count"),t0=performance.now();
-    (function step(t){var k=Math.min(1,(t-t0)/1400);fmt(e,end*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step)})(t0)})},{threshold:.6});
-  els.forEach(function(e){fmt(e,0);io.observe(e)});
+  /* The hero figures are outside context numbers. They are written straight into the HTML and shown as-is:
+     no count-up from zero, so a figure is never displayed as 0 or as a half-finished value. */
+  $$("[data-count]").forEach(function(e){var d=+e.getAttribute("data-dec")||0;e.textContent=(e.getAttribute("data-pre")||"")+(+e.getAttribute("data-count")).toFixed(d)+(e.getAttribute("data-suf")||"")});
 })();
 
 
@@ -1090,19 +1236,19 @@ function srcCard(k,title,pc,pt,meta,desc){return '<label class="src" id="src-'+k
 function slr(label,key,min,max,step){return '<div class="sl"><span>'+label+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+X.pg[key]+'" data-k="pg-'+key+'" aria-label="'+label+'"><b id="pgv-'+key+'"></b></div>'}
 
 function xStageHTML(i){
-  if(i===0)return xHead("Ingest","Three independent signals feed one model. Switch a signal off to see what the model would lose.")+
+  if(i===0)return xHead("Ingest","Three independent signals feed one scoring formula. Switch a signal off to see what the formula would lose.")+
     '<div class="srcs">'+srcCard("w","Weather forecast","fc","Forecast","Open-Meteo, demo snapshot","Temperature, humidity and wind for the next 7 days")+srcCard("n","Vegetation dryness (NDVI)","obs","Observed","","How dry and flammable the plants are, from Sentinel-2 imagery")+srcCard("f","Fire history","obs","Observed","NASA FIRMS, demo snapshot","Recurring hotspots and seasonal patterns")+'</div>'+
     '<div class="sl"><span>NDVI age</span><input type="range" min="0" max="10" step="1" value="'+X.age+'" data-k="age" aria-label="Days since last clear Sentinel-2 pass"><b id="ageV"></b></div>'+
     '<div class="mlab"><span>Data completeness</span><span id="cmpV"></span></div><div class="meter"><i id="cmpB"></i></div><div class="expl" id="ingMsg" style="margin-top:12px"></div>'+xFoot();
   if(i===1){
     var r=scoreFrom(34,31,11,.46,.6).N,c=X.cleaned;
     var rows=[["Temperature","93.2 °F","Fahrenheit, not Celsius","34.0 °C",r.temp],["Humidity","0.31","A fraction, not a percent","31 %",r.hum],["Wind","3.1 m/s","A different unit","11 km/h",r.wind],["NDVI","missing","Cloud over the pixel","0.46 (last clear pass)",r.ndvi],["Fire history","3 fires in 5 seasons","A count, not a score","0.60",r.hist]];
-    return xHead("Process","Raw feeds arrive in different units, with gaps. This step cleans them and aligns everything to one grid zone, so the model sees five comparable numbers.")+
+    return xHead("Process","Raw feeds arrive in different units, with gaps. This step cleans them and aligns everything to one grid zone, so the formula sees five comparable numbers.")+
       '<table class="ptab"><thead><tr><th>Signal</th><th>As received</th><th>Problem</th><th>After cleaning</th><th>Model feature</th></tr></thead><tbody>'+
       rows.map(function(x){return '<tr><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td class="'+(c?"dim":"bad")+'">'+(c?"Fixed":x[2])+'</td><td class="'+(c?"goodc":"dim")+'">'+(c?x[3]:"waiting")+'</td><td>'+(c?'<span class="nb"><i style="width:'+x[4]*100+'%"></i></span>'+x[4].toFixed(2):'<span class="dim">waiting</span>')+'</td></tr>'}).join("")+'</tbody></table>'+
       '<div class="cta-row"><button class="act" type="button" data-x="clean">'+(c?"Undo":"Clean and align")+'</button><span class="dim" style="font-size:14px">'+(c?"All five features are aligned to Zone C4 and scaled from 0 to 1.":"Press the button to clean the data.")+'</span></div>'+xFoot();
   }
-  if(i===2)return xHead("Predict","Move the sliders to see how the model turns conditions into a 0 to 100 risk score. This is the same scoring logic as the dashboard demo.")+
+  if(i===2)return xHead("Predict","Move the sliders to see how the weighted formula turns conditions into a 0 to 100 risk score. It is the same scoring code the dashboard uses.")+
     '<div class="pre"><button class="chipbtn" type="button" data-x="preset" data-p="cool">Cool, wet day</button><button class="chipbtn" type="button" data-x="preset" data-p="typical">Typical dry day</button><button class="chipbtn" type="button" data-x="preset" data-p="heat">Heatwave</button></div>'+
     slr("Temperature","temp",20,45,1)+slr("Humidity","hum",10,90,1)+slr("Wind speed","wind",0,40,1)+slr("NDVI (greenness)","ndvi",.2,.8,.01)+slr("Fire history","hist",0,1,.05)+'<div id="pgOut"></div>'+xFoot();
   if(i===3)return xHead("Visualize","The score becomes a color. Each tile is a forest zone. The ringed tile uses the score from Predict. Its neighbours have slightly different conditions.")+tileGrid(THRESH_HIGH)+
@@ -1119,10 +1265,10 @@ function xIngestUpdate(){
   $("#ageV").textContent=X.age+" day"+(X.age===1?"":"s");
   $("#meta-n").textContent="Sentinel-2, last clear pass "+X.age+" day"+(X.age===1?"":"s")+" ago";
   $("#cmpV").textContent=Math.round(n/3*100)+"%";$("#cmpB").style.width=(n/3*100)+"%";
-  if(!s.w)m.push("Without weather, the model loses its fastest-changing signal: temperature, humidity and wind.");
-  if(!s.n)m.push("Without NDVI, the model cannot see how dry the vegetation is.");
-  if(!s.f)m.push("Without fire history, the model loses recurring hotspots.");
-  if(s.n){if(X.age>5)m.push("This NDVI is older than Sentinel-2’s revisit time of about 5 days. Treat vegetation dryness with caution.");else if(X.age>=3)m.push("NDVI that is 3 to 5 days old is normal for Sentinel-2, so the model still uses it.");else m.push("The vegetation reading is fresh.")}
+  if(!s.w)m.push("Without weather, the formula loses its fastest-changing signal: temperature, humidity and wind.");
+  if(!s.n)m.push("Without NDVI, the formula cannot see how dry the vegetation is.");
+  if(!s.f)m.push("Without fire history, the formula loses recurring hotspots.");
+  if(s.n){if(X.age>5)m.push("This NDVI is older than Sentinel-2’s revisit time of about 5 days. Treat vegetation dryness with caution.");else if(X.age>=3)m.push("NDVI that is 3 to 5 days old is normal for Sentinel-2, so the formula still uses it.");else m.push("The vegetation reading is fresh.")}
   if(n===3&&X.age<=5)m.unshift("All three signals are present, so every zone can be scored.");
   $("#ingMsg").textContent=m.join(" ");
 }
@@ -1192,38 +1338,50 @@ function impactStats(){
   return{n:al.length,funded:fu.length,rows:rows,gain:Math.round(g),minD:Math.min.apply(null,days),maxD:Math.max.apply(null,days),pl:pl};
 }
 function evRender(){
+  if(typeof renderMethodLegend==="function")renderMethodLegend();
   $$("#evTabs button").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-evtab")===EV.tab)});
   var ban=$("#evBanner"),body=$("#evBody");ban.hidden=false;
-  if(EV.tab==="perf"||EV.tab==="back")ban.innerHTML=evReal()?'<span class="pill obs">Measured</span><span>Computed on held-out data: '+evData().labels.length+' zone-days.</span>':'<span class="pill ill">Illustrative sample</span><span>These charts use synthetic sample data to show how results will be reported. They are not results from our trained model.</span>';
-  else if(EV.tab==="impact")ban.innerHTML='<span class="pill ill">Simulation</span><span>Computed from the demo forecast and response simulation, using the assumptions listed under the table.</span>';
+  if(EV.tab==="perf")ban.innerHTML=!evReal()?'<span class="pill ill">Synthetic validation sample</span><span>Made-up labels and scores that show how results will be reported. They are not results of IGNIS AI.</span>':(IgnisMetrics.sufficiency(VALIDATION.labels,VALIDATION.scores).ok?'<span class="pill obs">Measured</span><span>Computed on '+VALIDATION.labels.length+' labelled zone-days from data/validation.json. Confirm the labels come from independent records before quoting these numbers.</span>':'<span class="pill na">Insufficient data</span><span>Metrics are withheld until there are enough labelled zone-days.</span>');
+  else if(EV.tab==="back")ban.innerHTML=BACKTEST?'<span class="pill na">Loaded from data/backtest.json</span><span>Labelled verified only where an event names an independent source.</span>':'<span class="pill ill">Synthetic sample scenarios</span><span>Made-up score sequences, not real fire events.</span>';
+  else if(EV.tab==="impact")ban.innerHTML='<span class="pill ill">Simulation</span><span>Computed from the active forecast ('+(DATA.source==="upload"?"your uploaded data":"demonstration data")+') and an assumption-based response simulation, using the assumptions listed under the table. It shows a potential operational benefit, not a measured result.</span>';
   else ban.hidden=true;
   if(EV.tab==="perf"){
-    var isPr=EV.curve==="pr",cur=isPr?prFor(evData()):rocFor(evData());
+    var v=evData(),real=evReal(),suff=IgnisMetrics.sufficiency(v.labels,v.scores);
+    if(real&&!suff.ok){
+      body.innerHTML='<div class="evcard"><h4>Metrics withheld: not enough labelled data</h4><p class="dim" style="font-size:14px">The file <code>data/validation.json</code> is loaded, but '+esc(suff.reason)+'. ROC-AUC, precision, recall and F1 computed on so few examples would be misleading, so IGNIS AI does not display them. Add more verified zone-days to publish performance.</p></div>';
+      return;
+    }
+    var isPr=EV.curve==="pr",cur=isPr?prFor(v):rocFor(v),synth=!real;
     var pts=cur.pts.map(function(p){return(44+p.x*252).toFixed(1)+","+(256-p.y*240).toFixed(1)}).join(" ");
     var grid="";[0,.25,.5,.75,1].forEach(function(g){grid+='<line x1="44" x2="296" y1="'+(256-g*240)+'" y2="'+(256-g*240)+'" stroke="var(--line)"/><line y1="16" y2="256" x1="'+(44+g*252)+'" x2="'+(44+g*252)+'" stroke="var(--line)"/><text x="38" y="'+(260-g*240)+'" text-anchor="end">'+g+'</text><text y="272" x="'+(44+g*252)+'" text-anchor="middle">'+g+'</text>'});
     var refLine=isPr
-      ?'<line x1="44" y1="'+(256-cur.baseline*240).toFixed(1)+'" x2="296" y2="'+(256-cur.baseline*240).toFixed(1)+'" stroke="var(--muted)" stroke-dasharray="5 5"/><text x="290" y="'+(250-cur.baseline*240).toFixed(1)+'" text-anchor="end" style="fill:var(--muted);font-size:10px">Prevalence ('+Math.round(cur.baseline*100)+'%)</text>'
+      ?'<line x1="44" y1="'+(256-cur.baseline*240).toFixed(1)+'" x2="296" y2="'+(256-cur.baseline*240).toFixed(1)+'" stroke="var(--muted)" stroke-dasharray="5 5"/><text x="290" y="'+(250-cur.baseline*240).toFixed(1)+'" text-anchor="end" style="fill:var(--muted);font-size:10px">Fire prevalence ('+Math.round(cur.baseline*100)+'%)</text>'
       :'<line x1="44" y1="256" x2="296" y2="16" stroke="var(--muted)" stroke-dasharray="5 5"/>';
     var xLab=isPr?"Recall (Fires caught)":"False alarm rate";
     var yLab=isPr?"Precision (Fires / Alerts)":"Fires caught";
-    var note=isPr?'PR-AUC (Average Precision). Evaluates performance under imbalanced fire occurrence.':'ROC-AUC. 0.5 is a coin flip, 1.0 is perfect discrimination.';
+    var head;
+    if(synth)head='<div class="synth-wm">SYNTHETIC SAMPLE: made-up labels and scores that only show how results will be reported. This is not IGNIS AI performance.</div><div style="margin-bottom:6px"><div class="nv">Not yet validated</div></div>';
+    else if(isPr)head='<div class="mchips" style="margin:0 0 6px"><div><b>'+cur.ap.toFixed(2)+'</b>Average Precision</div><div><b>'+cur.auc.toFixed(2)+'</b>PR-AUC (trapezoid)</div><div><b>'+Math.round(cur.baseline*100)+'%</b>Fire prevalence</div></div><p class="fine" style="margin:0 0 6px">Average Precision is the step-wise summary of the curve. PR-AUC (trapezoid) is the area under it by linear interpolation, which can read higher. They are different numbers.</p>';
+    else head='<div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:6px"><div class="auc">'+cur.auc.toFixed(2)+'</div><span class="dim" style="font-size:13px;padding-bottom:6px">ROC-AUC. 0.5 is a coin flip, 1.0 is perfect discrimination.</span></div>';
     body.innerHTML='<div class="evgrid"><div class="evcard">'+
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
-        '<h4>'+(isPr?'Precision-Recall curve':'ROC curve')+'</h4>'+
+        '<h4>'+(isPr?'Precision-Recall curve':'ROC curve')+(synth?' (shape only)':'')+'</h4>'+
         '<div style="display:inline-flex;background:var(--surface2);padding:2px;border-radius:8px;border:1px solid var(--line);gap:2px">'+
           '<button type="button" class="chipbtn" data-evcurve="roc" aria-pressed="'+(!isPr)+'" style="padding:3px 9px;font-size:11px;border:none;border-radius:6px;cursor:pointer;'+(!isPr?'background:var(--accent);color:var(--on-accent);font-weight:700':'color:var(--muted)')+'">ROC</button>'+
           '<button type="button" class="chipbtn" data-evcurve="pr" aria-pressed="'+isPr+'" style="padding:3px 9px;font-size:11px;border:none;border-radius:6px;cursor:pointer;'+(isPr?'background:var(--accent);color:var(--on-accent);font-weight:700':'color:var(--muted)')+'">PR Curve</button>'+
         '</div>'+
-      '</div>'+
-      '<div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:6px"><div class="auc">'+cur.auc.toFixed(2)+'</div><span class="dim" style="font-size:13px;padding-bottom:6px">'+note+'</span></div>'+
-      '<svg viewBox="0 0 320 290" role="img" aria-label="'+(isPr?'Precision-Recall':'ROC')+' curve">'+grid+refLine+'<polygon points="44,256 '+pts+' 296,256" fill="var(--accent)" opacity=".14"/><polyline class="draw" pathLength="1" points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/><circle id="evDot" r="7" fill="var(--ember)" stroke="var(--surface)" stroke-width="3"/><text x="170" y="287" text-anchor="middle">'+xLab+'</text><text transform="translate(10 136) rotate(-90)" text-anchor="middle">'+yLab+'</text></svg></div>'+
+      '</div>'+head+
+      '<svg viewBox="0 0 320 290" role="img" aria-label="'+(isPr?'Precision-Recall':'ROC')+' curve'+(synth?', synthetic sample':'')+'">'+grid+refLine+'<polygon points="44,256 '+pts+' 296,256" fill="var(--accent)" opacity="'+(synth?'.07':'.14')+'"/><polyline class="draw" pathLength="1" points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round" stroke-dasharray="'+(synth?'6 5':'none')+'"/><circle id="evDot" r="7" fill="var(--ember)" stroke="var(--surface)" stroke-width="3"/><text x="170" y="287" text-anchor="middle">'+xLab+'</text><text transform="translate(10 136) rotate(-90)" text-anchor="middle">'+yLab+'</text></svg></div>'+
       '<div class="evcard"><h4>What the threshold does</h4><div class="sl" style="grid-template-columns:110px 1fr 40px"><span>Alert threshold</span><input type="range" min="20" max="90" step="1" value="'+EV.th+'" data-ev="th" aria-label="Alert threshold"><b id="evThV"></b></div><div id="evDyn"></div></div></div>';
     evPerfUpdate();
   }else if(EV.tab==="back"){
     var bt=evBT();
-    var verifyBadge=evReal()
-      ?'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:rgba(98,182,203,.1);border-left:3px solid var(--accent);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Verification Status:</strong> Verified observational backtesting dataset loaded.</div>'
-      :'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:var(--surface2);border-left:3px solid var(--ember);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Verification Protocol:</strong> Synthetic illustrative replay benchmark. Demonstrates lead-time progression and miss profiles without fabricating historical incident logs. Drop observational FIRMS/MODIS archives into <code>data/backtest.json</code>.</div>';
+    var btLoaded=!!BACKTEST,btVer=btLoaded&&BACKTEST.every(function(x){return x.verified===true&&x.source});
+    var verifyBadge=btVer
+      ?'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:rgba(98,182,203,.1);border-left:3px solid var(--accent);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Verified events:</strong> every event below names an independent source.</div>'
+      :btLoaded
+      ?'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:var(--surface2);border-left:3px solid var(--med);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Unverified:</strong> scores were loaded from <code>data/backtest.json</code>. An event is only labelled verified when it has <code>verified: true</code> and a <code>source</code>.</div>'
+      :'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 13px;background:var(--surface2);border-left:3px solid var(--ember);border-radius:8px;font-size:12.5px;color:var(--muted)"><strong style="color:var(--ink)">Synthetic scenarios:</strong> the &ldquo;Sample fire&rdquo; replays are made-up score sequences, not real fire events. They show how lead time and misses are reported. To use real events, add them to <code>data/backtest.json</code>.</div>';
     body.innerHTML='<div class="evcard">'+
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><h4>Replay the week before a past fire</h4><span class="dim" style="font-size:12px">Temporal Step: 24h</span></div>'+
       verifyBadge+
@@ -1233,32 +1391,31 @@ function evRender(){
       '<div class="chart" id="evChart"></div>'+
       '<div class="sl" style="grid-template-columns:90px 1fr 110px;margin-top:10px"><button class="act" type="button" data-evplay="1" id="evPlay">▶ Play</button><input type="range" min="0" max="7" step="1" value="'+EV.idx+'" data-ev="idx" aria-label="Replay day"><b id="evIdxV"></b></div>'+
       '<div class="expl" id="evBtNote" style="margin-top:8px"></div>'+
-    '</div>';
+    '</div>'+caseStudyCard();
     evBtUpdate();
   }else if(EV.tab==="impact"){
     var I=impactStats();
-    body.innerHTML='<div class="evstats"><div class="evstat"><b>'+I.n+' of 24</b><span>zones flagged high risk in the 7-day window</span></div><div class="evstat"><b>'+I.minD+' to '+I.maxD+' days</b><span>of warning before a zone turns high risk</span></div><div class="evstat"><b>'+I.funded+' of '+I.n+'</b><span>flagged zones funded from a pool of '+POOL.tankers+' tankers and '+POOL.crews+' crews</span></div><div class="evstat"><b>'+I.gain+' min</b><span>faster water on a fire, on average, with staged units (simulated)</span></div></div>'+
+    body.innerHTML='<div class="evstats"><div class="evstat"><b>'+I.n+' of 24</b><span>zones flagged high risk in the '+NDAYS+'-day window</span></div><div class="evstat"><b>'+(I.n?(I.minD===I.maxD?I.minD:I.minD+" to "+I.maxD)+" day"+(I.maxD===1?"":"s"):"None")+'</b><span>'+(I.n?"until a zone first crosses the high-risk threshold: a potential lead time, not a guaranteed warning":"no zone reaches high risk in this forecast")+'</span></div><div class="evstat"><b>'+I.funded+' of '+I.n+'</b><span>flagged zones funded from a pool of '+POOL.tankers+' tankers and '+POOL.crews+' crews</span></div><div class="evstat"><b>'+(I.funded?I.gain+" min":"n/a")+'</b><span>faster water on a fire, on average, with staged units (simulated from assumptions)</span></div></div>'+
       '<div class="evgrid"><div class="evcard"><h4>Reactive versus proactive</h4><div class="lead-demo" style="margin:10px 0 0"><div class="lrow" style="grid-template-columns:100px 1fr"><span>Reactive</span><div class="lbar"><span style="flex:3;background:var(--surface2)">No warning</span><span style="flex:1;background:var(--high);color:#1F1740">Ignition</span><span style="flex:2;background:var(--med);color:#1F1740">Crews mobilize</span></div></div><div class="lrow" style="grid-template-columns:100px 1fr"><span>IGNIS AI</span><div class="lbar"><span style="flex:3;background:var(--accent);color:var(--on-accent)">Alert, units staged</span><span style="flex:1;background:var(--high);color:#1F1740">Ignition</span><span style="flex:2;background:var(--surface2)">Crews on site</span></div></div></div><p class="fine">Illustrative timeline, not to scale.</p></div>'+
-      '<div class="evcard"><h4>Resource allocation, this week</h4><table class="itab"><thead><tr><th>Zone</th><th>Alert on</th><th>Tankers</th><th>Reactive</th><th>Staged</th><th>Gain</th></tr></thead><tbody>'+I.rows.map(function(r){return '<tr><td><b>'+r.id+'</b></td><td>Day '+r.day+'</td><td>'+r.t+'</td><td>'+r.r+' min</td><td>'+r.p+' min</td><td class="goodc">'+r.g+' min</td></tr>'}).join("")+'</tbody></table><p class="fine">Assumed: '+SIM_ASSUME.detect+' min to detect, '+SIM_ASSUME.dispatch+' min to dispatch, '+SIM_ASSUME.speed+' km/h road speed, '+SIM_ASSUME.setup+' min setup. Staged units are already in the zone. '+(I.n>I.funded?(I.n-I.funded)+' flagged zone needs mutual aid.':'')+'</p></div></div>';
+      '<div class="evcard"><h4>Resource allocation, this week</h4><table class="itab"><thead><tr><th>Zone</th><th>Alert on</th><th>Tankers</th><th>Reactive</th><th>Staged</th><th>Gain</th></tr></thead><tbody>'+I.rows.map(function(r){return '<tr><td><b>'+r.id+'</b></td><td>Day '+r.day+'</td><td>'+r.t+'</td><td>'+r.r+' min</td><td>'+r.p+' min</td><td class="goodc">'+r.g+' min</td></tr>'}).join("")+'</tbody></table><p class="fine">Assumed: '+SIM_ASSUME.detect+' min to detect, '+SIM_ASSUME.dispatch+' min to dispatch, '+SIM_ASSUME.speed+' km/h road speed, '+SIM_ASSUME.setup+' min setup. Staged units are already in the zone. '+(I.n>I.funded?(I.n-I.funded)+' flagged zone needs mutual aid.':'')+'</p></div></div>'+'<div class="evcard" style="margin-top:14px"><h4>How forecasts could help a fire station prepare</h4><ul class="dim" style="padding-left:20px;font-size:14.5px;display:grid;gap:6px"><li><b>Earlier situational awareness.</b> One map shows which grid zones are heading toward danger, up to seven days ahead.</li><li><b>Resource pre-positioning.</b> Tankers and crews can be staged near zones forecast to cross the threshold, instead of after a call.</li><li><b>Patrol prioritisation.</b> Patrols can go to the highest-scoring zones first.</li><li><b>Village-level warning preparation.</b> The nearest villages to each flagged zone are known in advance, so advisories can be drafted before conditions escalate.</li><li><b>Faster decisions.</b> Alerts, a checklist and an AI-written briefing are ready when the officer opens the dashboard.</li></ul><p class="fine">Lead time and minutes saved are potential benefits under the stated assumptions. They have not been measured in a real deployment.</p></div>';
   }else{
-    body.innerHTML='<div class="evgrid"><div class="evcard"><h4>Limitations</h4><ul class="dim" style="padding-left:20px;font-size:15px;display:grid;gap:8px"><li>Sentinel-2 revisits a location about every 5 days, so NDVI can be a few days old. Cloud cover can delay it further.</li><li>Weather forecasts lose accuracy toward Day 7.</li><li>Fires started by people can be hard to predict from environmental data alone.</li><li>Alerts, dispatch and village messages in this prototype are simulated.</li><li>Zones, scores and the response simulation on this site use demo data and assumed values.</li></ul></div>'+
-      '<div class="evcard"><h4>How we will validate</h4><ol class="plan"><li><span><b>Split by time.</b> Train on earlier fire seasons and test on a later one, so the model never sees the future.</span></li><li><span><b>Backtest past fires.</b> Replay the week before each fire and record the warning lead time.</span></li><li><span><b>Report misses too.</b> Publish precision, recall and ROC-AUC, plus fires the model missed.</span></li><li><span><b>Pilot with a station.</b> Check whether staged units change real response times.</span></li></ol></div></div>';
+    body.innerHTML='<div class="evgrid"><div class="evcard"><h4>Limitations</h4><ul class="dim" style="padding-left:20px;font-size:15px;display:grid;gap:8px"><li><b>Data quality and coverage.</b> Scores are only as good as the inputs, and the 24-zone grid is illustrative.</li><li><b>Weather forecast uncertainty.</b> Forecasts lose accuracy toward Day 7.</li><li><b>Satellite revisits.</b> Sentinel-2 revisits a location about every 5 days, so NDVI can be a few days old. Cloud cover can delay it further.</li><li><b>Risk is not detection.</b> A high score means conditions favour fire, not that a fire has started. Fires started by people are hard to predict from environmental data alone.</li><li><b>Local validation is needed</b> before any operational use. The weights are expert-set and have not been tested against real outcomes.</li><li>Alerts, dispatch and village messages in this prototype are simulated.</li></ul></div>'+
+      '<div class="evcard"><h4>How we will validate</h4><ol class="plan"><li><span><b>Fix the weights first.</b> They are expert-set, not trained. Settle them before looking at outcomes, so they are not tuned to the answers.</span></li><li><span><b>Backtest past fires without leaking the future.</b> Replay each event using only information available at the forecast time and record the warning lead time.</span></li><li><span><b>Report misses too.</b> Publish precision, recall, F1, ROC-AUC and Average Precision with the confusion matrix, but only once there are enough verified labels.</span></li><li><span><b>Pilot with a station.</b> Check locally whether staged units change real response times.</span></li></ol></div></div>';
   }
 }
 function evPerfUpdate(){
-  var v=evData(),c=confusion(v,EV.th),tp=c.tp,fp=c.fp,fn=c.fn,tn=c.tn;
-  var pr=tp/Math.max(1,tp+fp),re=tp/Math.max(1,tp+fn),f1=pr+re?2*pr*re/(pr+re):0,far=fp/Math.max(1,fp+tn);
-  $("#evThV").textContent=EV.th;
-  if(EV.curve==="pr"){
-    $("#evDot").setAttribute("cx",(44+re*252).toFixed(1));
-    $("#evDot").setAttribute("cy",(256-pr*240).toFixed(1));
-  }else{
-    $("#evDot").setAttribute("cx",(44+far*252).toFixed(1));
-    $("#evDot").setAttribute("cy",(256-re*240).toFixed(1));
+  var v=evData();$("#evThV").textContent=EV.th;
+  if(!evReal()){
+    var d0=$("#evDot");if(d0)d0.style.display="none";
+    $("#evDyn").innerHTML='<p class="dim" style="font-size:14px">The confusion matrix, precision, recall and F1 appear here once real labelled validation data is loaded in <code>data/validation.json</code> (at least '+IgnisMetrics.MIN_SAMPLES+' zone-days with '+IgnisMetrics.MIN_POSITIVES+' fires and '+IgnisMetrics.MIN_NEGATIVES+' non-fires). Until then they are <b>Not yet validated</b>.</p>';
+    return;
   }
+  var c=IgnisMetrics.confusionAt(v.labels,v.scores,EV.th),r=IgnisMetrics.rates(c),tp=c.tp,fp=c.fp,fn=c.fn,tn=c.tn;
+  if(EV.curve==="pr"){$("#evDot").setAttribute("cx",(44+r.recall*252).toFixed(1));$("#evDot").setAttribute("cy",(256-r.precision*240).toFixed(1))}
+  else{$("#evDot").setAttribute("cx",(44+r.falseAlarmRate*252).toFixed(1));$("#evDot").setAttribute("cy",(256-r.recall*240).toFixed(1))}
   $("#evDyn").innerHTML='<div class="cm"><div></div><div class="h">Fire happened</div><div class="h">No fire</div><div class="h">Alert raised</div><div class="c good"><b>'+tp+'</b>Fires caught</div><div class="c bad"><b>'+fp+'</b>False alarms</div><div class="h">No alert</div><div class="c bad"><b>'+fn+'</b>Fires missed</div><div class="c good"><b>'+tn+'</b>Correctly quiet</div></div>'+
-   '<div class="mchips"><div><b>'+pr.toFixed(2)+'</b>Precision</div><div><b>'+re.toFixed(2)+'</b>Recall</div><div><b>'+f1.toFixed(2)+'</b>F1 score</div><div><b>'+far.toFixed(2)+'</b>False alarm rate</div></div>'+
-   '<p class="dim" style="font-size:14px">At a threshold of '+EV.th+', the model raises '+(tp+fp)+' alerts. It catches '+tp+' of '+(tp+fn)+' fire zone-days ('+Math.round(re*100)+'%), and '+fp+' alerts are false alarms. Lower the threshold to catch more fires, at the cost of more false alarms.</p>';
+   '<div class="mchips"><div><b>'+r.precision.toFixed(2)+'</b>Precision</div><div><b>'+r.recall.toFixed(2)+'</b>Recall</div><div><b>'+r.f1.toFixed(2)+'</b>F1 score</div><div><b>'+r.falseAlarmRate.toFixed(2)+'</b>False alarm rate</div></div>'+
+   '<p class="dim" style="font-size:14px">At a threshold of '+EV.th+', the system raises '+(tp+fp)+' alerts. It catches '+tp+' of '+(tp+fn)+' fire zone-days ('+Math.round(r.recall*100)+'%), and '+fp+' alerts are false alarms. Lower the threshold to catch more fires, at the cost of more false alarms.</p>';
 }
 function evBtUpdate(){
   var sc=evBT()[EV.bt],s=sc.scores,idx=EV.idx,TH=THRESH_HIGH,cross=-1,i;
@@ -1283,7 +1440,7 @@ function evBtUpdate(){
     '<div class="evstat"><b>'+sc.zone+'</b><span>zone replayed</span></div>'+
   '</div>';
   $("#evIdxV").textContent=idx===n?"Ignition":"D-"+(n-idx);
-  $("#evBtNote").textContent=sc.note;
+  $("#evBtNote").innerHTML=esc(sc.note||"")+(sc.verified===true&&sc.source?'<div class="fine">Verified event. Source: '+esc(sc.source)+(sc.date?" · "+esc(sc.date):"")+(sc.location?" · "+esc(sc.location):"")+".</div>":'<div class="fine">Sample scenario or unverified entry, not a confirmed real event.</div>')+'<div class="fine">Information used: forecasts issued up to '+(idx===n?"the ignition day":"D-"+(n-idx))+' only. Later days are never shown.</div>';
   var sl=$('[data-ev="idx"]');if(sl)sl.value=idx;
   var pb=$("#evPlay");if(pb)pb.textContent=EV.playing?"❚❚ Pause":"▶ Play";
 }
@@ -1327,7 +1484,7 @@ var map=null,vb={x:0,y:0,w:900,h:600},inited=false;
 var STAGES=[
   {n:"Ingest",d:"Pulling weather forecast, Sentinel-2 NDVI and FIRMS fire history",ms:800},
   {n:"Features",d:"Aligning 5 features across 24 grid zones",ms:700},
-  {n:"Predict",d:"Scoring every zone for Days 1 to 7",ms:900},
+  {n:"Predict",d:"Scoring every zone with the weighted engine",ms:900},
   {n:"Map",d:"Rendering the risk overlay",ms:600},
   {n:"Alert",d:"Checking zones against the danger threshold",ms:600}
 ];
@@ -1347,12 +1504,12 @@ function renderSummary(){
 function renderLegend(){
   var L=$("#legend");
   if(S.mode==="risk")L.innerHTML='<span><i class="sw" style="background:var(--low)"></i>Low</span><span><i class="sw" style="background:var(--med)"></i>Medium</span><span><i class="sw" style="background:var(--high)"></i>High</span><span><i class="sw" style="background:var(--ember);border-radius:2px"></i>Fire station</span><span><i class="sw" style="background:var(--accent)"></i>Units staged</span>';
-  else if(S.mode==="ndvi")L.innerHTML='<span><i class="sw" style="background:hsl(40 65% 55%)"></i>Dry vegetation</span><span><i class="sw" style="background:hsl(140 65% 52%)"></i>Healthy vegetation</span><span>Observed NDVI, illustrative</span>';
-  else L.innerHTML='<span><i class="sw" style="background:hsl(20 72% 58%)"></i>Dry air</span><span><i class="sw" style="background:hsl(205 72% 58%)"></i>Humid air</span><span>Forecast humidity</span>';
+  else if(S.mode==="ndvi")L.innerHTML='<span><i class="sw" style="background:hsl(40 65% 55%)"></i>Dry vegetation</span><span><i class="sw" style="background:hsl(140 65% 52%)"></i>Healthy vegetation</span><span>'+(DATA.source==="upload"?"NDVI from your uploaded data":"Synthetic demo NDVI")+'</span>';
+  else L.innerHTML='<span><i class="sw" style="background:hsl(20 72% 58%)"></i>Dry air</span><span><i class="sw" style="background:hsl(205 72% 58%)"></i>Humid air</span><span>'+(DATA.source==="upload"?"Humidity from your uploaded data":"Synthetic demo humidity")+'</span>';
 }
 function renderTimeline(){
-  var h='<button type="button" class="play" id="play">'+(S.playing?"❚❚ Pause":"▶ Play 7 days")+'</button>';
-  for(var d=0;d<7;d++){
+  var h='<button type="button" class="play" id="play">'+(S.playing?"❚❚ Pause":"▶ Play "+NDAYS+" day"+(NDAYS>1?"s":""))+'</button>';
+  for(var d=0;d<NDAYS;d++){
     var m="";
     if(S.ran){var c=dayCounts(d);m='<div class="mini"><i style="width:'+c.high/24*100+'%;background:var(--high)"></i><i style="width:'+c.med/24*100+'%;background:var(--med)"></i><i style="width:'+c.low/24*100+'%;background:var(--low)"></i></div>'}
     else m='<div class="mini"></div>';
@@ -1361,10 +1518,10 @@ function renderTimeline(){
   $("#timeline").innerHTML=h;
 }
 function spark(z){
-  var pts=FC[z.id].map(function(f,i){return[20+i*(360/6),70-f.score*.62]});
+  var pts=FC[z.id].map(function(f,i){return[20+i*(360/Math.max(1,NDAYS-1)),70-f.score*.62]});
   var line=pts.map(function(p){return p[0].toFixed(0)+","+p[1].toFixed(0)}).join(" ");
   var ty=function(t){return 70-t*.62};
-  return '<svg class="spark" viewBox="0 0 400 80" role="img" aria-label="Seven day risk trend">'+
+  return '<svg class="spark" viewBox="0 0 400 80" role="img" aria-label="Risk trend over the forecast window">'+
    '<line x1="0" x2="400" y1="'+ty(THRESH_HIGH)+'" y2="'+ty(THRESH_HIGH)+'" stroke="var(--high)" stroke-dasharray="4 4" stroke-opacity=".6"/>'+
    '<polyline points="'+line+'" fill="none" stroke="var(--ember)" stroke-width="2.5" stroke-linejoin="round"/>'+
    pts.map(function(p,i){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(i===S.day?6:3)+'" fill="'+(i===S.day?"var(--ember)":"var(--surface)")+'" stroke="var(--ember)" stroke-width="2"/>'}).join("")+'</svg>';
@@ -1510,7 +1667,7 @@ function renderPanel(){
    }).join("")+'</div>'+
    '<div class="blk"><div class="expl">'+explain(z,f)+'</div></div>'+
    '<div class="blk"><h4>Tactical Suppression Assessment</h4><div class="action" style="border-left-color:'+tac.col+'"><span class="tactical-badge" style="background:'+tac.col+';color:#08202A">'+tac.t+'</span><p style="margin-top:4px">'+tac.act+(uu&&uu.status==="ready"?'<br><b style="color:var(--accent)">Units are staged in this zone.</b>':'')+'</p></div></div>'+
-   aiBlock(z,f)+'<div class="tags"><span class="pill fc">Weather: forecast</span><span class="pill obs">NDVI and fire history: observed</span><span class="pill ill">Score: demo scoring function</span></div>';
+   aiBlock(z,f)+'<div class="tags">'+(DATA.source==="upload"?'<span class="pill usr">Inputs: your uploaded observations</span>':'<span class="pill ill">Inputs: synthetic demo data</span>')+'<span class="pill na">Score: deterministic weighted formula (not ML)</span></div>';
 }
 
 
@@ -1706,6 +1863,7 @@ function doBriefing() {
   topRisks.sort(function(a, b) { return b.score - a.score; });
   var payload = {
     day: S.day + 1,
+    dataSource: dataSourcePayload(),
     alerts: S.alerts.map(function(a) { return { zoneId: a.id, day: a.day + 1, score: a.score }; }),
     topRisks: topRisks.slice(0, 8),
     villages: VILLAGES.map(function(v) { return v.n; }),
@@ -1765,7 +1923,8 @@ function doChat(q) {
       alertCount: S.alerts.length,
       stagedCount: stagedCount(),
       alertsSummary: alertsSummary,
-      zoneConditions: zoneConditions
+      zoneConditions: zoneConditions,
+      dataSource: dataSourcePayload()
     }
   };
   fetch("/api/ai-chat", {
@@ -1799,13 +1958,13 @@ function doChat(q) {
 
 /* ---------- Groq explanation (server-side route; the key never reaches the browser) ---------- */
 function aiBlock(z,f){
-  if(!CFG.groq)return '<div class="blk"><div class="aibox"><b>AI explanation</b>Appears here when the server has a Groq API key. The AI only explains the model’s numbers. It never sets the score.</div></div>';
+  if(!CFG.groq)return '<div class="blk"><div class="aibox"><b>AI explanation</b>Appears here when the server has a Groq API key. The AI only explains the scoring engine’s numbers. It never sets the score.</div></div>';
   var key=z.id+":"+S.day,a=S.ai&&S.ai.key===key?S.ai:null,out="",busy=a&&a.state==="loading";
   if(busy)out='<div class="aiload"><i></i><i></i><i></i> Asking Groq…</div>';
   else if(a&&a.state==="error")out='<div class="expl">'+esc(a.error)+'</div>';
   else if(a&&a.state==="ok"){
     var d=a.data,li=function(x){return '<ul class="ailist">'+(x||[]).map(function(t){return '<li>'+esc(t)+'</li>'}).join("")+'</ul>'};
-    out='<span class="aitag">Written by Groq</span><div class="expl">'+esc(d.explanation)+'</div><div style="font-size:13px;font-weight:700;margin-top:8px">Main factors</div>'+li(d.factors)+'<div style="font-size:13px;font-weight:700">Suggested actions</div>'+li(d.actions)+'<div class="fine">Generated from the model’s numbers. It does not change the score.</div>';
+    out='<span class="aitag">Written by Groq</span><div class="expl">'+esc(d.explanation)+'</div><div style="font-size:13px;font-weight:700;margin-top:8px">Main factors</div>'+li(d.factors)+'<div style="font-size:13px;font-weight:700">Suggested actions</div>'+li(d.actions)+'<div class="fine">Generated from the scoring engine’s numbers. It does not change the score.</div>';
   }
   return '<div class="blk"><h4>AI explanation</h4>'+out+'<button class="act sec wide" type="button" data-ai="1"'+(busy?" disabled":"")+'>'+(a&&a.state==="ok"?"Explain again":"Explain with AI")+'</button><button class="btn-guest" type="button" data-act="askzone" data-zid="'+z.id+'" style="margin-top:6px;width:100%;text-align:center">Ask Assistant about Zone '+z.id+' →</button></div>';
 }
@@ -1814,7 +1973,7 @@ function doAI(){
   var f=FC[z.id][S.day],key=z.id+":"+S.day,tot=0,k;
   for(k in f.contrib)tot+=f.contrib[k];
   var drivers=Object.keys(f.contrib).map(function(k){return{key:k,pct:Math.round(f.contrib[k]/(tot||1)*100)}}).sort(function(a,b){return b.pct-a.pct}).slice(0,3);
-  var payload={zoneId:z.id,day:S.day+1,score:f.score,drivers:drivers,
+  var payload={zoneId:z.id,day:S.day+1,score:f.score,dataSource:dataSourcePayload(),drivers:drivers,
     conditions:{tempC:+f.temp.toFixed(1),humidityPct:Math.round(f.hum),windKmh:Math.round(f.wind),ndvi:+f.ndvi.toFixed(2),fireHistory:+f.hist.toFixed(2)},
     nearestVillage:nearest(VILLAGES,z.cx,z.cy).n,station:nearest(STATIONS,z.cx,z.cy).n};
   S.ai={key:key,state:"loading"};renderPanel();
@@ -1833,7 +1992,9 @@ var supabaseClient = null;
 var APP_USER = { id: null, email: null, name: "Guest Officer", isGuest: true };
 var authMode = "signin";
 
+function syncHeroCta() { var h = $("#heroStart"); if (h) h.textContent = APP_USER.isGuest ? "Sign in / Get started" : "Open the dashboard"; }
 function updateAuthUI() {
+  syncHeroCta();
   var btn = $("#btnAuthOpen"), av = $("#authAvatar"), lbl = $("#authLabel");
   var nameEl = $("#authUserName"), emailEl = $("#authUserEmail"), stEl = $("#authStatusText");
   if (!btn) return;
@@ -1871,11 +2032,13 @@ function setSessionUser(u) {
     setGuestUser();
   }
   updateAuthUI();
+  onUserChanged();
 }
 
 function setGuestUser() {
   APP_USER = { id: null, email: null, name: "Guest Officer", isGuest: true };
   updateAuthUI();
+  onUserChanged();
 }
 
 function showAuthNotice(msg, isError) {
@@ -1887,31 +2050,68 @@ function showAuthNotice(msg, isError) {
   el.style.display = "block";
 }
 
-function openAuthModal(mode) {
-  authMode = mode || "signin";
-  $("#tabSignIn").setAttribute("aria-selected", authMode === "signin");
-  $("#tabSignUp").setAttribute("aria-selected", authMode === "signup");
-  $("#btnAuthSubmit").textContent = authMode === "signin" ? "Sign In" : "Create Account";
-  $("#authSubtitle").textContent = CFG.supabaseUrl
-    ? "Secure station access via Supabase"
-    : "Supabase not connected. Running in demo mode.";
+function setAuthMode(mode) {
+  authMode = mode === "signup" ? "signup" : "signin";
+  var su = authMode === "signup";
+  $("#tabSignIn").setAttribute("aria-selected", !su);
+  $("#tabSignUp").setAttribute("aria-selected", su);
+  $("#authTitle").textContent = su ? "Create your IGNIS AI account" : "Sign in to IGNIS AI";
+  $("#btnAuthSubmit").textContent = su ? "Create account" : "Sign in";
+  $("#authPassword").setAttribute("autocomplete", su ? "new-password" : "current-password");
+  $("#authPwHint").textContent = su ? "Use at least 8 characters." : "";
+  clearAuthErrors();
   showAuthNotice("", false);
-  if (!CFG.supabaseUrl) {
-    showAuthNotice("Supabase credentials are not set in .env. You can sign in as a demo officer below or continue as guest.", false);
-  }
+}
+function clearAuthErrors() {
+  ["Email", "Password"].forEach(function(n) { $("#auth" + n + "Err").textContent = ""; $("#auth" + n).removeAttribute("aria-invalid"); });
+}
+function validateAuthForm() {
+  var email = $("#authEmail").value.trim(), pw = $("#authPassword").value, ok = true;
+  clearAuthErrors();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $("#authEmailErr").textContent = "Enter a valid email address."; $("#authEmail").setAttribute("aria-invalid", "true"); ok = false; }
+  if (!pw) { $("#authPasswordErr").textContent = "Enter your password."; $("#authPassword").setAttribute("aria-invalid", "true"); ok = false; }
+  else if (authMode === "signup" && pw.length < 8) { $("#authPasswordErr").textContent = "Password must be at least 8 characters."; $("#authPassword").setAttribute("aria-invalid", "true"); ok = false; }
+  return ok ? { email: email, password: pw } : null;
+}
+function authBusy(b) {
+  var btn = $("#btnAuthSubmit");
+  btn.disabled = b; $("#btnGoogleAuth").disabled = b;
+  if (b) btn.innerHTML = '<span class="spin"></span> ' + (authMode === "signup" ? "Creating account…" : "Signing in…");
+  else btn.textContent = authMode === "signup" ? "Create account" : "Sign in";
+}
+function friendlyAuthError(e) {
+  var m = String((e && e.message) || "");
+  if (/invalid login/i.test(m)) return "Email or password is incorrect.";
+  if (/not confirmed/i.test(m)) return "Confirm your email address first. Check your inbox for the link.";
+  if (/already registered|already been registered/i.test(m)) return "An account with this email already exists. Try signing in.";
+  if (/rate limit|too many/i.test(m)) return "Too many attempts. Wait a minute and try again.";
+  if (/network|failed to fetch/i.test(m)) return "Could not reach the sign-in service. Check your connection.";
+  return m || "Authentication failed.";
+}
+function openAuthModal(mode) {
+  setAuthMode(mode || "signin");
+  $("#authSubtitle").textContent = CFG.supabaseUrl
+    ? "Sign in to save datasets, alerts and briefings to your account. Guests keep full access to the demo."
+    : "Supabase is not connected on this server, so sign-in runs in demo mode only.";
+  if (!CFG.supabaseUrl) showAuthNotice("Demo mode: this is not real authentication. Any email signs you in locally and nothing is saved to an account.", false);
   $("#authModal").hidden = false;
+  document.body.style.overflow = "hidden";
   var em = $("#authEmail"); if (em) em.focus();
 }
 
 function closeAuthModal() {
   $("#authModal").hidden = true;
+  document.body.style.overflow = "";
   showAuthNotice("", false);
+  clearAuthErrors();
+  var p = $("#authPassword"); if (p) { p.value = ""; p.type = "password"; }
+  var t = $("#pwToggle"); if (t) { t.textContent = "Show"; t.setAttribute("aria-pressed", "false"); }
 }
 
 function initAuth() {
   if (CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase && window.supabase.createClient) {
     try {
-      supabaseClient = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
+      supabaseClient = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
       supabaseClient.auth.getSession().then(function(res) {
         if (res && res.data && res.data.session && res.data.session.user) {
           setSessionUser(res.data.session.user);
@@ -1961,94 +2161,325 @@ function initAuth() {
       try { await supabaseClient.auth.signOut(); } catch(e){}
     }
     setGuestUser();
+    toast("Signed out. Guest demo mode is still available.");
   };
   $("#btnAuthClose").onclick = closeAuthModal;
-  $("#tabSignIn").onclick = function() {
-    authMode = "signin";
-    $("#tabSignIn").setAttribute("aria-selected", true);
-    $("#tabSignUp").setAttribute("aria-selected", false);
-    $("#btnAuthSubmit").textContent = "Sign In";
-    showAuthNotice("", false);
+  $("#tabSignIn").onclick = function() { setAuthMode("signin"); };
+  $("#tabSignUp").onclick = function() { setAuthMode("signup"); };
+  $("#btnContinueGuest").onclick = function() { closeAuthModal(); setGuestUser(); };
+  $("#heroStart").onclick = function() { if (APP_USER.isGuest) openAuthModal("signin"); else location.hash = "#intelligence"; };
+  $("#pwToggle").onclick = function() {
+    var i = $("#authPassword"), show = i.type === "password";
+    i.type = show ? "text" : "password";
+    this.textContent = show ? "Hide" : "Show";
+    this.setAttribute("aria-pressed", show ? "true" : "false");
+    this.setAttribute("aria-label", show ? "Hide password" : "Show password");
   };
-  $("#tabSignUp").onclick = function() {
-    authMode = "signup";
-    $("#tabSignIn").setAttribute("aria-selected", false);
-    $("#tabSignUp").setAttribute("aria-selected", true);
-    $("#btnAuthSubmit").textContent = "Create Account";
-    showAuthNotice("", false);
-  };
-  $("#btnContinueGuest").onclick = function() {
-    closeAuthModal();
-    setGuestUser();
-  };
+  document.addEventListener("keydown", function(e) { if (e.key === "Escape" && !$("#authModal").hidden) closeAuthModal(); });
   $("#btnGoogleAuth").onclick = async function() {
     if (!supabaseClient) {
-      showAuthNotice("Supabase credentials not configured in .env. Enter any email above to test as demo officer.", true);
+      showAuthNotice("Google sign-in needs Supabase to be connected on this server. You can continue as a guest or use demo mode.", true);
       return;
     }
-    showAuthNotice("Connecting to Google OAuth…", false);
+    showAuthNotice("Connecting to Google…", false);
     try {
-      var res = await supabaseClient.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin }
-      });
-      if (res && res.error) showAuthNotice(res.error.message, true);
+      var res = await supabaseClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin } });
+      if (res && res.error) showAuthNotice(friendlyAuthError(res.error), true);
     } catch(e) {
-      showAuthNotice(e.message || "Google sign in error.", true);
+      showAuthNotice(friendlyAuthError(e), true);
     }
   };
   $("#authForm").onsubmit = async function(e) {
     e.preventDefault();
-    var email = $("#authEmail").value.trim();
-    var password = $("#authPassword").value;
-    if (!email || !password) return;
-
+    var f = validateAuthForm();
+    if (!f) return;
     if (!supabaseClient) {
       APP_USER = {
         id: "demo_" + Date.now().toString(36),
-        email: email,
-        name: email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, function(l){return l.toUpperCase()}),
+        email: f.email,
+        name: f.email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, function(l){return l.toUpperCase()}),
         isGuest: false
       };
       updateAuthUI();
-      showAuthNotice("Signed in as Demo Station Officer (" + email + ")", false);
-      setTimeout(closeAuthModal, 600);
+      showAuthNotice("Demo mode: this is not real authentication and nothing is saved to an account.", false);
+      toast("Demo mode sign-in (no account). Uploads stay in this session.");
+      setTimeout(closeAuthModal, 900);
       return;
     }
-
-    $("#btnAuthSubmit").disabled = true;
-    $("#btnAuthSubmit").textContent = authMode === "signin" ? "Signing In…" : "Creating Account…";
+    authBusy(true);
     try {
+      var res;
       if (authMode === "signin") {
-        var res = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+        res = await supabaseClient.auth.signInWithPassword({ email: f.email, password: f.password });
         if (res.error) throw res.error;
         setSessionUser(res.data.user);
-        showAuthNotice("Signed in successfully!", false);
+        showAuthNotice("Signed in successfully.", false);
+        toast("Signed in as " + f.email);
         setTimeout(closeAuthModal, 600);
       } else {
-        var res = await supabaseClient.auth.signUp({ email: email, password: password });
+        res = await supabaseClient.auth.signUp({ email: f.email, password: f.password });
         if (res.error) throw res.error;
         if (res.data.user && !res.data.session) {
-          showAuthNotice("Account created! Check your email for a confirmation link.", false);
+          showAuthNotice("Account created. Check your email for a confirmation link, then sign in.", false);
         } else {
           setSessionUser(res.data.user);
-          showAuthNotice("Account created and signed in!", false);
+          toast("Account created. Signed in as " + f.email);
           setTimeout(closeAuthModal, 600);
         }
       }
     } catch(err) {
-      showAuthNotice(err.message || "Authentication failed.", true);
+      showAuthNotice(friendlyAuthError(err), true);
     } finally {
-      $("#btnAuthSubmit").disabled = false;
-      $("#btnAuthSubmit").textContent = authMode === "signin" ? "Sign In" : "Create Account";
+      authBusy(false);
     }
   };
 })();
 
+/* ---------- Active dataset + CSV upload (observations drive the EXISTING scoring engine) ---------- */
+var U={busy:false,csv:"",filename:"",result:null,saved:[],savedState:"idle",open:false,err:null};
+var UP_MAX_BYTES=200*1024;
+function isoLocal(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fmtDate(iso){var p=String(iso).split("-");return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}
+function dataSourcePayload(){return DATA.source==="upload"?{type:"user-upload",name:DATA.name,dateStart:DATA.dates[0],dateEnd:DATA.dates[DATA.dates.length-1]}:{type:"demo"}}
+var _toastT=null;
+function toast(msg){var t=$("#toast");if(!t||!msg)return;t.textContent=msg;t.classList.add("show");clearTimeout(_toastT);_toastT=setTimeout(function(){t.classList.remove("show")},4200)}
+
+function buildFCFromObs(obs,dates){
+  var di={},out={};dates.forEach(function(d,i){di[d]=i});
+  ZONES.forEach(function(z){out[z.id]=new Array(dates.length)});
+  obs.forEach(function(o){
+    var r=scoreFrom(o.temp_c,o.humidity_pct,o.wind_kmh,o.ndvi,o.fire_history);
+    out[o.zone_id][di[o.date]]={score:r.score,temp:o.temp_c,hum:o.humidity_pct,wind:o.wind_kmh,ndvi:o.ndvi,hist:o.fire_history,contrib:r.contrib};
+  });
+  ZONES.forEach(function(z){for(var i=0;i<dates.length;i++){if(!out[z.id][i])throw new Error("Dataset is missing zone "+z.id+" on "+dates[i]+".")}});
+  return out;
+}
+function resetForDataChange(){
+  stopPlay();
+  S.ai=null;S.briefing=null;S.chat=[];S.chatLoading=false;S.selected=null;S.acked={};S.alerts=[];S.ran=false;S.running=false;S.day=0;S.tab="zone";S.checklists={};S.fresh=false;
+  resetResponse();
+  $("#stages").innerHTML="";
+  $("#plog").textContent="Press Run AI forecast to score every zone for the next "+NDAYS+" days.";
+  $("#run").disabled=false;$("#run").textContent="Run AI forecast";
+}
+function updateDataBar(){
+  var pill=$("#dsPill"),txt=$("#dsText"),b=$("#mapwrap .badge-ill"),dm=$("#dsDemo");
+  if(DATA.source==="upload"){
+    pill.className="pill usr";pill.textContent="User-uploaded observations";
+    txt.innerHTML="<b>"+esc(DATA.name)+"</b> · "+DATA.rowCount+" rows · "+esc(fmtDate(DATA.dates[0]))+(DATA.dates.length>1?" to "+esc(fmtDate(DATA.dates[DATA.dates.length-1])):"")+" · uploaded "+esc(new Date(DATA.uploadedAt).toLocaleString("en-IN"))+" · "+(DATA.saved?"saved to your account":"this session only")+" · not independently verified";
+    if(b)b.textContent="Zone grid illustrative · data: your upload";
+    dm.hidden=false;
+  }else{
+    pill.className="pill ill";pill.textContent="Demonstration data (synthetic)";
+    txt.textContent="Generated deterministically for demonstration. These are not real measurements.";
+    if(b)b.textContent="Illustrative demo region";
+    dm.hidden=true;
+  }
+  if(typeof renderMethodLegend==="function")renderMethodLegend();
+  var mm=$("#methodSource");if(mm)mm.innerHTML=DATA.source==="upload"?"Active dataset: <b>"+esc(DATA.name)+"</b> (user-uploaded, not independently verified)":"Active dataset: <b>demonstration data</b> (synthetic)";
+}
+function activateUpload(res){
+  if(S.running){toast("A forecast is still running. Try again in a moment.");return false}
+  var ds=res.dataset,dates=(res.forecast&&res.forecast.dates)||ds.dates;
+  var fc=buildFCFromObs(res.observations,dates),bad=0;
+  ZONES.forEach(function(z){dates.forEach(function(d,i){if(fc[z.id][i].score!==res.forecast.scores[z.id][i])bad++})});
+  if(bad)throw new Error("The browser and server scored "+bad+" values differently. Hard-refresh the page (Ctrl+Shift+R) and try again.");
+  FC=fc;NDAYS=dates.length;
+  DATA={source:"upload",name:ds.name,dates:dates,uploadedAt:ds.uploadedAt,id:ds.id||null,saved:!!ds.saved,ownerId:ds.saved?APP_USER.id:null,rowCount:ds.rowCount||res.observations.length};
+  resetForDataChange();updateDataBar();U.result=null;renderUploadResult();
+  runForecast();
+  return true;
+}
+function useDemoData(){
+  if(S.running){toast("A forecast is still running. Try again in a moment.");return}
+  FC=DEMO_FC;NDAYS=7;DATA={source:"demo",name:"Demonstration data",dates:null,uploadedAt:null,id:null,saved:false,ownerId:null,rowCount:null};
+  resetForDataChange();updateDataBar();refresh();
+}
+function downloadFile(name,text){var b=new Blob([text],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+function tplDates(){var s=new Date(),out=[];s.setDate(s.getDate()+1);for(var d=0;d<7;d++){var t=new Date(s);t.setDate(s.getDate()+d);out.push(isoLocal(t))}return out}
+function tplBlank(){
+  var rows=[IgnisScoring.OBS_COLUMNS.map(function(c){return c.name}).join(",")];
+  tplDates().forEach(function(dt){IgnisScoring.ZONE_IDS.forEach(function(z){rows.push(z+","+dt+",,,,,")})});
+  downloadFile("ignis-ai-template.csv",rows.join("\n")+"\n");
+  toast("Template downloaded. The measurement columns are empty on purpose: fill every cell with your own observations.");
+}
+function tplDemo(){
+  var rows=[IgnisScoring.OBS_COLUMNS.map(function(c){return c.name}).join(",")],dts=tplDates();
+  dts.forEach(function(dt,d){ZONES.forEach(function(z){var f=DEMO_FC[z.id][d];rows.push([z.id,dt,f.temp.toFixed(4),f.hum.toFixed(4),f.wind.toFixed(4),f.ndvi.toFixed(4),f.hist.toFixed(4)].join(","))})});
+  downloadFile("ignis-ai-example-SYNTHETIC-demo-values.csv",rows.join("\n")+"\n");
+  toast("Example downloaded. It contains synthetic demo values, not real measurements. Use it to test the upload.");
+}
+function renderFmt(){
+  var rows=IgnisScoring.OBS_COLUMNS.map(function(c){var r=c.min===null?(c.name==="zone_id"?"A1 to D6":"YYYY-MM-DD"):c.min+" to "+c.max;return "<tr><td><code>"+c.name+"</code></td><td>"+esc(c.unit||"text")+"</td><td>"+r+"</td></tr>"}).join("");
+  $("#dsFmtBody").innerHTML='<table><thead><tr><th>Column</th><th>Unit</th><th>Allowed</th></tr></thead><tbody>'+rows+'</tbody></table><ul><li>One row per zone per date: the <b>final observed values</b> for that zone-day. No demo offsets are added.</li><li>Every zone (A1 to D6) needs a row for every date. 1 to 7 consecutive dates, so uploaded data is never mixed with demo data.</li><li><code>fire_history</code> is a normalised 0 to 1 index (0 = no recorded recurrence, 1 = highest), not a count of fires.</li><li>No blanks, text in number columns, out-of-range values or duplicate zone-dates. Nothing is filled in for you.</li></ul>';
+}
+function setProg(p,t){var b=$("#dsProg");if(p===null){b.hidden=true;return}b.hidden=false;b.firstElementChild.style.width=p+"%";$("#dsProgText").textContent=t||""}
+function showUploadErrors(list,title){
+  U.result=null;U.err={title:title||"Upload failed.",list:list};renderUploadResult();
+}
+function handleFile(file){
+  if(!file)return;U.err=null;U.result=null;
+  var name=file.name||"upload.csv",max=(CFG.csv&&CFG.csv.maxBytes)||UP_MAX_BYTES;
+  if(!CFG.server){showUploadErrors(["CSV upload needs the IGNIS AI server (it validates and scores your data). Run the app with npm start."]);return}
+  if(!/\.csv$/i.test(name)){showUploadErrors(["The file name must end in .csv. Export your data as CSV (comma separated)."]);return}
+  if(file.size===0){showUploadErrors(["The file is empty."]);return}
+  if(file.size>max){showUploadErrors(["The file is "+Math.round(file.size/1024)+" KB. The limit is "+Math.round(max/1024)+" KB."]);return}
+  setProg(5,"Reading file…");renderUploadResult();
+  var fr=new FileReader();
+  fr.onprogress=function(e){if(e.lengthComputable)setProg(5+Math.round(e.loaded/e.total*35),"Reading file…")};
+  fr.onerror=function(){setProg(null);showUploadErrors(["The file could not be read."])};
+  fr.onload=function(){
+    U.csv=String(fr.result);U.filename=name;setProg(60,"Validating on the server…");
+    fetch("/api/datasets/validate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({filename:name,csv:U.csv})})
+      .then(function(r){return r.json().then(function(j){return{ok:r.ok,status:r.status,j:j}},function(){return{ok:false,status:r.status,j:null}})})
+      .then(function(res){
+        setProg(100,"Validation complete");setTimeout(function(){setProg(null)},600);
+        if(!res.ok){throw new Error((res.j&&res.j.error)||(res.status===413?"The file is too large.":"The server could not validate the file ("+res.status+")."))}
+        U.result=res.j;U.err=null;renderUploadResult();
+      })
+      .catch(function(e){setProg(null);showUploadErrors([e.message||"Could not reach the server."])});
+  };
+  fr.readAsText(file);
+}
+function renderUploadResult(){
+  var el=$("#dsResult");if(!el)return;var h="";
+  if(U.err){h='<div class="dserr"><b>'+esc(U.err.title)+'</b><ul>'+U.err.list.map(function(m){return"<li>"+esc(m)+"</li>"}).join("")+"</ul></div>"}
+  else if(U.result&&!U.result.ok){
+    var r=U.result,more=r.totalErrors>r.errors.length?r.totalErrors-r.errors.length:0;
+    h='<div class="dserr"><b>'+r.totalErrors+' problem'+(r.totalErrors===1?"":"s")+' found. Nothing was uploaded or changed.</b><ul>'+r.errors.map(function(e){return"<li>"+(e.line?"<code>line "+e.line+(e.column?", "+esc(e.column):"")+"</code> ":"")+esc(e.message)+"</li>"}).join("")+(more?"<li>…and "+more+" more.</li>":"")+'</ul><div class="fine">Fix the file and choose it again. Invalid or missing values are never replaced with invented ones.</div></div>';
+  }else if(U.result&&U.result.ok){
+    var r=U.result,s=r.summary;
+    h='<div class="dsok"><b>'+esc(U.filename)+' passed validation.</b> '+s.rowCount+' rows · '+s.zones+' zones × '+s.days+' day'+(s.days>1?"s":"")+' · '+esc(fmtDate(s.dateStart))+(s.days>1?" to "+esc(fmtDate(s.dateEnd)):"")+'</div>';
+    if(r.warnings&&r.warnings.length)h+=r.warnings.map(function(w){return'<div class="dswarn">'+esc(w)+"</div>"}).join("");
+    h+='<div class="fine" style="margin-top:10px">Preview of the first '+r.preview.length+' of '+s.rowCount+' rows</div><div class="dsprev"><table><thead><tr><th>zone</th><th>date</th><th>temp °C</th><th>humidity %</th><th>wind km/h</th><th>NDVI</th><th>fire hist.</th></tr></thead><tbody>'+r.preview.map(function(p){return"<tr><td>"+esc(p.zone_id)+"</td><td>"+esc(p.date)+"</td><td>"+p.temp_c+"</td><td>"+p.humidity_pct+"</td><td>"+p.wind_kmh+"</td><td>"+p.ndvi+"</td><td>"+p.fire_history+"</td></tr>"}).join("")+'</tbody></table></div>';
+    var guest=APP_USER.isGuest||!supabaseClient;
+    h+='<div class="dsact"><button type="button" class="act" id="dsConfirm"'+(U.busy?" disabled":"")+'>'+(U.busy?"Running forecast…":"Confirm and run forecast")+'</button><button type="button" class="chipbtn" id="dsCancel"'+(U.busy?" disabled":"")+'>Cancel</button><span class="fine" style="margin:0">'+(guest?"You are a guest: this dataset is used for this session only and is not saved. Sign in to keep it.":"This dataset will be saved to your account and scored with the existing weighted engine.")+'</span></div>';
+  }
+  el.innerHTML=h;
+}
+function confirmUpload(){
+  if(U.busy||!U.result||!U.result.ok)return;
+  if(S.running){toast("A forecast is still running. Try again in a moment.");return}
+  U.busy=true;renderUploadResult();
+  var useAuth=!APP_USER.isGuest&&!!supabaseClient,opts={method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({filename:U.filename,csv:U.csv})};
+  (useAuth?authenticatedFetch("/api/datasets",opts):fetch("/api/datasets",opts))
+    .then(function(r){return r.json().then(function(j){return{ok:r.ok,status:r.status,j:j}},function(){return{ok:false,status:r.status,j:null}})})
+    .then(function(res){
+      U.busy=false;
+      if(!res.ok){
+        if(res.j&&res.j.errors){U.result=Object.assign({ok:false},res.j);renderUploadResult();return}
+        throw new Error((res.j&&res.j.error)||"The upload failed ("+res.status+").");
+      }
+      if(activateUpload(res.j)){toast(res.j.note||"Dataset loaded.");closeUploadPanel();loadSavedDatasets()}
+    })
+    .catch(function(e){U.busy=false;showUploadErrors([e.message||"The upload failed."],"Could not run the forecast.")});
+}
+function openUploadPanel(){U.open=true;$("#dspanel").hidden=false;$("#dsToggle").setAttribute("aria-expanded","true");$("#dsToggle").textContent="Close upload";loadSavedDatasets()}
+function closeUploadPanel(){U.open=false;$("#dspanel").hidden=true;$("#dsToggle").setAttribute("aria-expanded","false");$("#dsToggle").textContent="Upload CSV data"}
+function renderSaved(){
+  var el=$("#dsSaved");if(!el)return;
+  if(APP_USER.isGuest||!supabaseClient){el.innerHTML='<div class="fine">Sign in to save datasets to your account and reopen them later. Guest uploads are used for the current session only.</div>';return}
+  if(U.savedState==="loading"){el.innerHTML='<div class="fine">Loading your saved datasets…</div>';return}
+  if(U.savedState==="error"){el.innerHTML='<div class="fine" style="color:#FFA190">'+esc(U.err&&U.err.list?"":"")+"Could not load your saved datasets.</div>";return}
+  if(!U.saved.length){el.innerHTML='<div class="fine">You have no saved datasets yet. Datasets you upload while signed in appear here, visible only to you.</div>';return}
+  el.innerHTML='<h4>Your saved datasets</h4>'+U.saved.map(function(d){return'<div class="dsrow"><div><b>'+esc(d.name)+'</b><small>'+esc(fmtDate(d.dateStart))+(d.dateEnd!==d.dateStart?" to "+esc(fmtDate(d.dateEnd)):"")+' · '+d.rowCount+' rows · uploaded '+esc(new Date(d.uploadedAt).toLocaleString("en-IN"))+'</small></div><div><button type="button" class="chipbtn" data-dsload="'+esc(d.id)+'">Load</button><button type="button" class="chipbtn" data-dsdel="'+esc(d.id)+'" aria-label="Delete dataset '+esc(d.name)+'">Delete</button></div></div>'}).join("");
+}
+function loadSavedDatasets(){
+  if(APP_USER.isGuest||!supabaseClient||!CFG.server){U.saved=[];U.savedState="guest";renderSaved();return}
+  var uid=APP_USER.id;U.savedState="loading";renderSaved();
+  authenticatedFetch("/api/datasets").then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(res){
+    if(APP_USER.id!==uid)return; // session changed while loading
+    if(!res.ok)throw new Error("failed");U.saved=res.j.datasets||[];U.savedState="ok";renderSaved();
+  }).catch(function(){if(APP_USER.id!==uid)return;U.savedState="error";renderSaved()});
+}
+function loadSavedDataset(id){
+  authenticatedFetch("/api/datasets/"+encodeURIComponent(id)).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(res){
+    if(!res.ok)throw new Error((res.j&&res.j.error)||"Could not open the dataset.");
+    if(activateUpload(res.j)){toast("Loaded “"+res.j.dataset.name+"”.");closeUploadPanel()}
+  }).catch(function(e){showUploadErrors([e.message],"Could not open the dataset.")});
+}
+function deleteSavedDataset(id){
+  var d=U.saved.filter(function(x){return x.id===id})[0];
+  if(!window.confirm("Delete “"+(d?d.name:"this dataset")+"” permanently? This cannot be undone."))return;
+  authenticatedFetch("/api/datasets/"+encodeURIComponent(id),{method:"DELETE"}).then(function(r){if(!r.ok)throw new Error("Could not delete the dataset.");
+    if(DATA.id===id)useDemoData();toast("Dataset deleted.");loadSavedDatasets();
+  }).catch(function(e){showUploadErrors([e.message],"Delete failed.")});
+}
+/* Called whenever the signed-in user changes (sign in, sign out, switch account). Never leaves one user's data on screen for the next. */
+function onUserChanged(){
+  var uid=APP_USER.isGuest?null:APP_USER.id;
+  if(onUserChanged.last===uid)return;onUserChanged.last=uid;
+  if(DATA.source==="upload"&&DATA.saved&&DATA.ownerId!==uid){useDemoData();toast("The saved dataset was closed because the signed-in user changed.")}
+  U.saved=[];U.savedState="idle";S.briefingHistory=[];
+  if(uid&&CFG.server&&supabaseClient){
+    authenticatedFetch("/api/alerts").then(function(r){return r.ok?r.json():null}).then(function(res){
+      if(!res||APP_USER.id!==uid)return;
+      S.acked={};(res.alerts||[]).forEach(function(al){if(al.acknowledged)S.acked[al.zoneId]=true});if(map)renderPanel();
+    }).catch(function(){});
+  }else{S.acked={};if(map)renderPanel()}
+  renderSaved();if(U.open)loadSavedDatasets();
+}
+(function wireUpload(){
+  renderFmt();updateDataBar();renderSaved();
+  var drop=$("#drop"),file=$("#dsFile");
+  $("#dsToggle").onclick=function(){U.open?closeUploadPanel():openUploadPanel()};
+  $("#dsDemo").onclick=useDemoData;
+  $("#tplBlank").onclick=tplBlank;$("#tplDemo").onclick=tplDemo;
+  drop.onclick=function(){file.click()};
+  drop.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();file.click()}};
+  file.onchange=function(){if(file.files&&file.files[0])handleFile(file.files[0]);file.value=""};
+  ["dragenter","dragover"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add("over")})});
+  ["dragleave","drop"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove("over")})});
+  drop.addEventListener("drop",function(e){var f=e.dataTransfer&&e.dataTransfer.files;if(f&&f.length>1){showUploadErrors(["Drop one CSV file at a time."]);return}if(f&&f[0])handleFile(f[0])});
+  $("#dspanel").addEventListener("click",function(e){
+    var t=e.target.closest("button");if(!t)return;
+    if(t.id==="dsConfirm")confirmUpload();
+    else if(t.id==="dsCancel"){U.result=null;U.err=null;renderUploadResult()}
+    else if(t.getAttribute("data-dsload"))loadSavedDataset(t.getAttribute("data-dsload"));
+    else if(t.getAttribute("data-dsdel"))deleteSavedDataset(t.getAttribute("data-dsdel"));
+  });
+  // the page must not navigate away if a file is dropped outside the drop zone
+  ["dragover","drop"].forEach(function(t){window.addEventListener(t,function(e){if(!e.target.closest||!e.target.closest("#drop"))e.preventDefault()})});
+})();
+
+/* ---------- Methodology section (generated from the real engine constants, so it cannot drift from the code) ---------- */
+function renderMethod(){
+  var el=$("#methodTable");if(!el)return;
+  var S0=IgnisScoring,names={temp:"Temperature",hum:"Dry air (low humidity)",wind:"Wind speed",ndvi:"Dry vegetation (low NDVI)",hist:"Fire history"},colFor={},k;
+  S0.OBS_COLUMNS.forEach(function(c){if(c.engine)colFor[c.engine]=c});
+  el.innerHTML='<table class="mtab"><thead><tr><th>Input</th><th>Turned into 0 to 1 by</th><th>Weight</th></tr></thead><tbody>'+Object.keys(S0.WEIGHTS).map(function(k){var c=colFor[k];return"<tr><td><b>"+names[k]+"</b><br><code>"+c.name+"</code> ("+esc(c.unit)+")</td><td><code>"+esc(S0.NORMALISATION[k])+"</code></td><td><b>"+Math.round(S0.WEIGHTS[k]*100)+"%</b></td></tr>"}).join("")+"</tbody></table>";
+  $("#methodFormula").textContent="weighted_sum = sum of (weight x normalised input)      range 0 to 1\nscore = round( clamp( (weighted_sum - "+S0.STRETCH_OFFSET+") / "+S0.STRETCH_SPAN+" ) x 100 )      range 0 to 100\nlow: score < "+S0.THRESH_MED+"   medium: "+S0.THRESH_MED+" to "+(S0.THRESH_HIGH-1)+"   high (alert): "+S0.THRESH_HIGH+" and above";
+  var ex=PRESETS.typical,r=scoreFrom(ex.temp,ex.hum,ex.wind,ex.ndvi,ex.hist),sum=0;
+  for(k in S0.WEIGHTS)sum+=S0.WEIGHTS[k]*r.N[k];
+  $("#methodExample").innerHTML="<p>Illustrative inputs (not a measurement): "+ex.temp+" °C, "+ex.hum+"% humidity, "+ex.wind+" km/h wind, NDVI "+ex.ndvi+", fire history "+ex.hist+".</p><table class=\"mtab\"><tbody>"+Object.keys(S0.WEIGHTS).map(function(k){return"<tr><td>"+names[k]+"</td><td>"+r.N[k].toFixed(2)+" × "+S0.WEIGHTS[k]+"</td><td>= "+(r.N[k]*S0.WEIGHTS[k]).toFixed(3)+"</td></tr>"}).join("")+"</tbody></table><p>Weighted sum "+sum.toFixed(3)+" gives a score of <b>"+r.score+"</b> ("+sevName(r.score).toLowerCase()+").</p>";
+  $("#methodGroqStatus").innerHTML='<span class="fine">Checking Groq status…</span>';
+}
+function renderMethodGroq(){
+  var el=$("#methodGroqStatus");if(!el)return;
+  el.innerHTML=CFG.groq?'<span class="pill obs">Groq connected</span> <span class="fine">model: '+esc(CFG.groqModel||"default")+'</span>':'<span class="pill na">Groq not configured on this server</span> <span class="fine">AI explanations are off here. Forecasts are unaffected.</span>';
+}
+function renderMethodLegend(){
+  var el=$("#dataLegend");if(!el)return;
+  var realMetrics=!!VALIDATION&&IgnisMetrics.sufficiency(VALIDATION.labels,VALIDATION.scores).ok;
+  var btv=!!BACKTEST&&BACKTEST.every(function(x){return x.verified===true&&x.source});
+  var items=[
+    ["ill","Demonstration data","Synthetic values from a fixed generator. Shown when no CSV is loaded.",DATA.source==="demo"],
+    ["ill","Synthetic validation samples","Made-up labels and scores that only show how the Evidence charts look. No performance claim.",!VALIDATION],
+    ["usr","User-uploaded observations","Your own CSV, checked for format and range but not independently verified.",DATA.source==="upload"],
+    ["na","Verified historical observations",btv?"Loaded from data/backtest.json with a named source for each event.":"Archived observations matched to independently recorded fires. None loaded yet.",btv],
+    ["na","Measured model performance",realMetrics?"Computed from labelled data in data/validation.json.":"Not yet validated. Needs verified labelled history (at least "+IgnisMetrics.MIN_SAMPLES+" zone-days).",realMetrics]
+  ];
+  el.innerHTML=items.map(function(i){return'<div><span class="pill '+i[0]+'">'+i[1]+'</span><span>'+i[2]+(i[3]?' <b style="color:var(--ink)">(active)</b>':'')+'</span></div>'}).join("");
+}
+function caseStudyCard(){
+  return '<div class="evcard" style="margin-top:14px"><h4>How a real case study is run, without leaking the future</h4><ol class="cs-steps"><li><span>Pick an event from an independent record, for example NASA FIRMS detections or a forest-department log. Note its date, location and zone.</span></li><li><span>Fix the forecast time at D-k. Use only observations time-stamped at or before that moment: the weather forecast issued then, the latest Sentinel-2 NDVI available then, and fire history up to then.</span></li><li><span>Upload those observations as a CSV (one row per zone per date), or add the daily scores to <code>data/backtest.json</code>. Both use the same scoring engine.</span></li><li><span>Compare with the recorded outcome: was the zone at or above '+THRESH_HIGH+' before ignition, and how many days earlier? Report the misses too.</span></li></ol><p class="fine">The replay above only reveals scores up to the selected day, so a forecast made on D-3 never sees D-2 to ignition.</p></div>';
+}
+renderMethod();renderMethodLegend();
+
 (function loadServer(){
   if(!window.fetch)return;
   fetch("/api/config",{cache:"no-store"}).then(function(r){return r.ok?r.json():Promise.reject()}).then(function(c){
-    CFG.server=true;CFG.groq=!!c.groq;CFG.db=!!c.db;
+    CFG.server=true;CFG.groq=!!c.groq;CFG.db=!!c.db;CFG.csv=c.csv||null;CFG.groqModel=c.groqModel||"";if(CFG.csv&&$("#dsMax"))$("#dsMax").textContent=Math.round(CFG.csv.maxBytes/1024)+" KB";if(typeof renderMethodGroq==="function")renderMethodGroq();
     CFG.supabaseUrl=c.supabaseUrl||"";CFG.supabaseAnonKey=c.supabaseAnonKey||"";
     initAuth();
     fetch("/api/validation").then(function(r){return r.ok?r.json():null}).then(function(v){if(v&&v.labels&&v.scores&&v.labels.length===v.scores.length&&v.labels.length>0){VALIDATION=v;ROC_CACHE=null;PR_CACHE=null;evRender()}}).catch(function(){});
@@ -2123,21 +2554,21 @@ async function runForecast(){
   refresh();
   for(var i=0;i<STAGES.length;i++){
     var e=$('.stage[data-i="'+i+'"]');e.style.setProperty("--ms",STAGES[i].ms+"ms");e.className="stage active";
-    $("#plog").textContent=STAGES[i].d+"…";
+    $("#plog").textContent=(i===0&&DATA.source==="upload"?"Loading your validated CSV observations (no demo data mixed in)":STAGES[i].d)+"…";
     await sleep(reduce?120:STAGES[i].ms);e.className="stage done";
   }
   S.alerts=buildAlerts();S.ran=true;S.running=false;S.fresh=true;S.day=0;S.tab="alerts";persistAlerts();
   if(map)map.sweep();
   $("#run").disabled=false;$("#run").textContent="Re-run forecast";
-  $("#plog").textContent="Forecast ready: 24 zones × 7 days = 168 predictions. "+S.alerts.length+" zones cross the high-risk threshold. Open the Response tab to act on them.";
+  $("#plog").textContent="Forecast ready ("+(DATA.source==="upload"?"from your uploaded data":"demonstration data")+"): 24 zones × "+NDAYS+" day"+(NDAYS>1?"s":"")+" = "+(24*NDAYS)+" predictions. "+S.alerts.length+" zones cross the high-risk threshold. Open the Response tab to act on them.";
   refresh();
 }
 function stopPlay(){if(S.playing){clearInterval(S.playing);S.playing=null}}
 function togglePlay(){
   if(!S.ran)return;
   if(S.playing){stopPlay();renderTimeline();return}
-  if(S.day>=6)S.day=0;
-  S.playing=setInterval(function(){if(S.day>=6){stopPlay();refresh();return}S.day++;refresh()},1100);
+  if(S.day>=NDAYS-1)S.day=0;
+  S.playing=setInterval(function(){if(S.day>=NDAYS-1){stopPlay();refresh();return}S.day++;refresh()},1100);
   refresh();
 }
 function doPlan(){
@@ -2315,7 +2746,7 @@ function initDash(){
   });
   document.addEventListener("keydown",function(e){
     if($("#intelligence").hidden||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
-    if(e.key==="ArrowRight"&&S.day<6){stopPlay();setDay(S.day+1)}
+    if(e.key==="ArrowRight"&&S.day<NDAYS-1){stopPlay();setDay(S.day+1)}
     if(e.key==="ArrowLeft"&&S.day>0){stopPlay();setDay(S.day-1)}
   });
   refresh();
@@ -2334,5 +2765,6 @@ window.addEventListener("hashchange",route);
 route();
 })();
 </script>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

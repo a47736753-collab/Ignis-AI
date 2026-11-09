@@ -5,8 +5,14 @@
   "description": "IGNIS AI: forest fire risk predictor with early warning (IGC Hackathon 2026 prototype)",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node tests/run-all.js",
+    "test:e2e": "python3 tests/e2e/run_e2e.py && python3 tests/e2e/run_e2e_ui.py"
   },
-  "engines": { "node": ">=18" },
-  "optionalDependencies": { "pg": "^8.11.0" }
+  "engines": {
+    "node": ">=18"
+  },
+  "optionalDependencies": {
+    "pg": "^8.11.0"
+  }
 }
